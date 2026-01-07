@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pameks Digital Organization</title>
+    <title>Pameks Organization Chart</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
@@ -13,114 +13,227 @@
     <style>
         :root {
             --primary: #0f172a;
-            --accent: #3b82f6;
-            --glass: rgba(255, 255, 255, 0.9);
-            --bg-gradient: radial-gradient(circle at center, #f8fafc 0%, #cbd5e1 100%);
+            --accent: #2563eb;
+            --bg-body: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.95);
+            --border: #e2e8f0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient);
+            background: var(--bg-body);
             height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
             color: var(--primary);
         }
 
-        #network-container { width: 100%; height: 100%; }
-
-        .ui-layer {
-            position: absolute; z-index: 10; pointer-events: none;
-            width: 100%; height: 100%; top: 0; left: 0;
-            display: flex; flex-direction: column; justify-content: space-between; padding: 24px;
+        /* --- ÜST MENÜ (HEADER) --- */
+        .top-bar {
+            background: var(--glass);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            z-index: 100;
         }
 
-        .header-panel {
-            pointer-events: auto; background: var(--glass); backdrop-filter: blur(12px);
-            padding: 12px 20px; border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.6);
-            display: inline-flex; align-items: center; gap: 12px;
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
+
         .brand-icon {
-            width: 36px; height: 36px; background: var(--primary); color: white;
-            border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;
-        }
-        .brand-info h1 { font-size: 15px; font-weight: 700; }
-        .brand-info p { font-size: 11px; color: #64748b; font-weight: 500; }
-
-        .bottom-controls {
-            pointer-events: auto; align-self: center; background: var(--glass);
-            backdrop-filter: blur(16px); padding: 8px 12px; border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8);
-            display: flex; gap: 12px; align-items: center; margin-bottom: 20px;
+            width: 40px; height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
         }
 
-        select, .search-input {
-            padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0;
-            background: white; font-size: 13px; color: #334155; font-weight: 500;
+        .brand-text h1 { font-size: 18px; font-weight: 700; color: #1e293b; letter-spacing: -0.5px; }
+        .brand-text p { font-size: 12px; color: #64748b; }
+
+        /* KONTROLLER (Arama & Lokasyon) */
+        .controls-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        .search-input { width: 220px; padding-left: 34px; }
-        .search-wrapper { position: relative; }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; }
-        
+
+        select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        select:hover { border-color: var(--accent); }
+
+        .search-wrapper {
+            position: relative;
+        }
+        .search-input {
+            padding: 10px 15px 10px 38px;
+            width: 250px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .search-input:focus { 
+            width: 300px; 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .btn-reset {
+            padding: 10px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            color: #64748b;
+            transition: 0.2s;
+        }
+        .btn-reset:hover { background: #f1f5f9; color: var(--accent); }
+
+        /* --- ANA GRAFİK ALANI --- */
+        #tree-container {
+            flex: 1;
+            background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+            cursor: grab;
+        }
+        #tree-container:active { cursor: grabbing; }
+
+        /* --- YAN PANEL (SIDEBAR) --- */
         .sidebar {
-            pointer-events: auto; position: absolute; right: -350px; top: 24px; bottom: 24px;
-            width: 320px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px);
-            border-radius: 24px; box-shadow: -10px 0 40px rgba(0,0,0,0.05);
-            padding: 32px; transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 20;
+            position: absolute;
+            top: 80px; right: -350px; bottom: 20px;
+            width: 320px;
+            background: white;
+            border-radius: 16px 0 0 16px;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.05);
+            padding: 30px;
+            border: 1px solid var(--border);
+            border-right: none;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 90;
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
-        .sidebar.open { right: 24px; }
+        .sidebar.open { right: 0; }
         .sidebar-close { position: absolute; top: 20px; right: 20px; cursor: pointer; color: #cbd5e1; }
-        
-        .profile-avatar {
-            width: 80px; height: 80px; border-radius: 50%; background: var(--accent); color: white;
-            display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 600;
-            margin-bottom: 16px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-        }
-        .profile-name { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-        .profile-title { font-size: 13px; color: #64748b; margin-bottom: 24px; }
-        .info-row { width: 100%; display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
-        .info-label { font-size: 12px; color: #94a3b8; } .info-val { font-size: 13px; color: #334155; font-weight: 600; }
+        .sidebar-close:hover { color: var(--primary); }
 
-        /* Loader */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 999; display: flex; align-items: center; justify-content: center; }
-        .spinner { width: 40px; height: 40px; border: 3px solid #f1f5f9; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .profile-img {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        .profile-name { font-size: 20px; font-weight: 700; color: var(--primary); }
+        .profile-title { font-size: 14px; color: #64748b; font-weight: 500; margin-bottom: 25px; }
+
+        .info-card {
+            width: 100%;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex; justify-content: space-between;
+        }
+        .lbl { font-size: 12px; color: #94a3b8; font-weight: 600; }
+        .val { font-size: 13px; color: #334155; font-weight: 600; }
+
+        /* LOADER */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 1000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid #e2e8f0; border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* MOBİL UYUMLULUK */
+        @media (max-width: 768px) {
+            .top-bar { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .controls-section { width: 100%; flex-wrap: wrap; }
+            .search-input { width: 100%; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="spinner"></div></div>
+    <div id="loader">
+        <div class="spinner"></div>
+        <div style="margin-top:10px; font-size:14px; color:#64748b;">Loading Chart...</div>
+    </div>
 
-    <div id="network-container"></div>
-
-    <div class="ui-layer">
-        <div class="header-panel">
-            <div class="brand-icon"><i class="fas fa-sitemap"></i></div>
-            <div class="brand-info"><h1>PAMEKS</h1><p>Digital Organization Chart</p></div>
+    <div class="top-bar">
+        <div class="brand-section">
+            <div class="brand-icon"><i class="fas fa-network-wired"></i></div>
+            <div class="brand-text">
+                <h1>PAMEKS</h1>
+                <p>Organization Structure</p>
+            </div>
         </div>
 
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></div>
-            <div class="profile-avatar" id="sb-avatar"></div>
-            <div class="profile-name" id="sb-name">-</div>
-            <div class="profile-title" id="sb-title">-</div>
-            <div class="info-row"><span class="info-label">Location</span><span class="info-val" id="sb-loc">-</span></div>
-            <div class="info-row"><span class="info-label">Reports To</span><span class="info-val" id="sb-manager">-</span></div>
-        </div>
-
-        <div class="bottom-controls">
-            <select id="locationSelect" onchange="drawGraph()">
-                <option value="Istanbul">Istanbul HQ</option>
-                <option value="Malkara">Malkara Plant</option>
+        <div class="controls-section">
+            <select id="locationSelect" onchange="drawTree()">
+                <option value="Istanbul">🏢 Istanbul HQ</option>
+                <option value="Malkara">🏭 Malkara Plant</option>
             </select>
+
             <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" id="searchBox" placeholder="Search employee..." onkeyup="handleSearch()">
+                <input type="text" class="search-input" id="searchBox" placeholder="Search person..." onkeyup="handleSearch()">
             </div>
-            <button onclick="network.fit({animation:true})" style="border:none; background:none; cursor:pointer; color:#475569;"><i class="fas fa-compress-arrows-alt fa-lg"></i></button>
+
+            <button class="btn-reset" onclick="resetView()" title="Reset Zoom/View">
+                <i class="fas fa-compress-arrows-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="tree-container"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></div>
+        <img id="sb-img" src="" class="profile-img">
+        <div class="profile-name" id="sb-name">-</div>
+        <div class="profile-title" id="sb-title">-</div>
+
+        <div class="info-card">
+            <span class="lbl">LOCATION</span>
+            <span class="val" id="sb-loc">-</span>
+        </div>
+        <div class="info-card">
+            <span class="lbl">MANAGER</span>
+            <span class="val" id="sb-manager">-</span>
         </div>
     </div>
 
@@ -130,111 +243,145 @@
         let network = null;
         let allData = [];
 
+        // VERİYİ ÇEK
         Papa.parse(CSV_URL, {
-            download: true, header: true,
+            download: true,
+            header: true,
             complete: function(results) {
                 allData = results.data.filter(d => d.ID && d.ID.trim() !== "");
-                drawGraph();
+                drawTree();
                 document.getElementById('loader').style.display = 'none';
-            }
+            },
+            error: (err) => alert("Veri yükleme hatası. İnternet bağlantınızı kontrol edin.")
         });
 
-        function drawGraph() {
-            const container = document.getElementById('network-container');
+        // AĞACI ÇİZ
+        function drawTree() {
+            const container = document.getElementById('tree-container');
             const selectedLoc = document.getElementById('locationSelect').value;
             const searchTerm = document.getElementById('searchBox').value.toLowerCase();
 
-            let filteredData = allData.filter(item => item.Lokasyon && item.Lokasyon.trim() === selectedLoc);
+            // 1. Lokasyona göre filtrele
+            let locData = allData.filter(item => 
+                item.Lokasyon && item.Lokasyon.trim() === selectedLoc
+            );
 
+            // 2. Arama Mantığı (Hiyerarşiyi Koruyan)
+            let finalData = locData;
+            
             if (searchTerm.length > 1) {
-                filteredData = filteredData.filter(item => 
-                    item.ID.toLowerCase().includes(searchTerm) || item.Title.toLowerCase().includes(searchTerm)
+                // Eşleşenleri bul
+                const matches = locData.filter(p => 
+                    p.ID.toLowerCase().includes(searchTerm) || 
+                    p.Title.toLowerCase().includes(searchTerm)
                 );
+
+                if (matches.length > 0) {
+                    const visibleIDs = new Set();
+
+                    // Her eşleşme için: Kendisini ve tüm yöneticilerini (yukarı doğru) ekle
+                    matches.forEach(match => {
+                        let current = match;
+                        while(current) {
+                            visibleIDs.add(current.ID);
+                            // Bir üst yöneticisini bul
+                            if (current.Manager_ID) {
+                                current = locData.find(p => p.ID === current.Manager_ID);
+                            } else {
+                                current = null; // Zincir bitti
+                            }
+                        }
+                    });
+
+                    // Sadece bu ID'leri göster
+                    finalData = locData.filter(item => visibleIDs.has(item.ID));
+                } else {
+                    // Eşleşme yoksa boş döndür (veya uyarı verilebilir)
+                    // Şimdilik boş bırakıyoruz ki kullanıcı anlasın
+                    finalData = [];
+                }
             }
 
-            // --- İŞTE BURADA DÜZELTME YAPIYORUZ ---
-            // Yöneticileri tespit etmek için artık sadece manager_id'ye bakmıyoruz.
-            // Ünvanında "Board", "Yönetim", "Chairman" geçenleri ZORLA en tepeye alıyoruz.
-            
-            const nodes = filteredData.map(person => {
-                let level = 2; // Varsayılan çalışan
-
+            // 3. Node ve Edge'leri Oluştur
+            const nodes = finalData.map(person => {
+                // Patron Kontrolü
                 const titleUpper = person.Title ? person.Title.toUpperCase() : "";
+                const isBoard = titleUpper.includes("BOARD") || titleUpper.includes("YÖNETİM") || titleUpper.includes("CHAIRMAN");
                 
-                // 1. KURAL: BOARD OF MANAGEMENT HER ZAMAN EN BÜYÜK (LEVEL 0)
-                if (titleUpper.includes("BOARD") || titleUpper.includes("YÖNETİM") || titleUpper.includes("CHAIRMAN")) {
-                    level = 0; // The Big Boss
-                }
-                // 2. KURAL: Eğer bir başkası bu kişiye manager olarak atanmışsa, bu kişi Yöneticidir (LEVEL 1)
-                else {
-                    const isManager = allData.some(p => p.Manager_ID === person.ID);
-                    if (isManager) level = 1;
-                }
-
-                // GÖRSEL AYARLAR
-                let size, color, fontSize, fontColor;
-
-                if (level === 0) {
-                    size = 65; // MERKEZ KOCAMAN
-                    color = "#0f172a"; // En koyu (Siyah/Lacivert)
-                    fontSize = 24;
-                    fontColor = "#0f172a";
-                } else if (level === 1) {
-                    size = 35; // MÜDÜRLER ORTA
-                    color = "#3b82f6"; // Mavi
-                    fontSize = 16;
-                    fontColor = "#1e293b";
-                } else {
-                    size = 15; // ÇALIŞANLAR KÜÇÜK
-                    color = "#cbd5e1"; // Gri
-                    fontSize = 12;
-                    fontColor = "#64748b";
-                }
-
+                // Renk ve Boyut Ayarları
+                let bgColor = isBoard ? "#0f172a" : (person.Manager_ID ? "white" : "#eff6ff");
+                let textColor = isBoard ? "white" : "#1e293b";
+                let borderColor = isBoard ? "#0f172a" : "#2563eb";
+                
                 return {
                     id: person.ID,
-                    label: `<b>${person.ID}</b>\n${person.Title}`,
+                    label: `<b>${person.ID}</b>\n${person.Title}`, // İsim Kalın, Ünvan İnce
                     title: person.Title,
-                    shape: 'dot',
-                    size: size,
-                    color: { background: color, border: "white", highlight: { background: "#f59e0b", border: "white" } },
-                    borderWidth: level === 0 ? 6 : 3, // Patronun çerçevesi daha kalın
-                    font: { multi: 'html', size: fontSize, color: fontColor, face: "Inter", vadjust: 0 },
-                    shadow: { enabled: true, color: 'rgba(0,0,0,0.15)', size: 10, x: 0, y: 5 }
+                    image: `https://ui-avatars.com/api/?name=${encodeURIComponent(person.ID)}&background=${isBoard?'0f172a':'2563eb'}&color=fff&size=128`,
+                    shape: 'circularImage',
+                    size: isBoard ? 50 : 30,
+                    borderWidth: 3,
+                    color: {
+                        background: bgColor,
+                        border: borderColor,
+                        highlight: { border: "#f59e0b", background: "white" }
+                    },
+                    font: {
+                        multi: 'html',
+                        size: isBoard ? 16 : 14,
+                        color: "#334155",
+                        face: "Inter",
+                        vadjust: 5
+                    },
+                    shadow: { enabled: true, color: 'rgba(0,0,0,0.05)', size: 10, x:0, y:5 }
                 };
             });
 
-            const edges = filteredData
-                .filter(p => p.Manager_ID && filteredData.find(m => m.ID === p.Manager_ID))
+            const edges = finalData
+                .filter(p => p.Manager_ID && finalData.find(m => m.ID === p.Manager_ID))
                 .map(p => ({
                     from: p.Manager_ID,
                     to: p.ID,
-                    color: { color: "#cbd5e1", opacity: 0.6 },
-                    width: 1
+                    color: { color: "#cbd5e1" },
+                    width: 1.5,
+                    smooth: { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }
                 }));
 
+            // 4. Vis.js Ayarları (HİYERARŞİK DÜZEN)
             const data = { nodes: nodes, edges: edges };
-
+            
             const options = {
-                layout: { improvedLayout: true },
-                physics: {
-                    enabled: true,
-                    barnesHut: {
-                        gravitationalConstant: -5000, // Güçlü itme (birbirlerinden ayrılsınlar)
-                        centralGravity: 0.5,          // Merkeze çekim
-                        springLength: 200,            // Bağlantı uzunluğu
-                        springConstant: 0.04,
-                        damping: 0.09,
-                        avoidOverlap: 1
+                layout: {
+                    hierarchical: {
+                        enabled: true,
+                        direction: 'UD',        // UP to DOWN
+                        sortMethod: 'directed', // Yöneticiden asta doğru
+                        levelSeparation: 140,   // Katmanlar arası boşluk
+                        nodeSpacing: 180,       // Kişiler arası yan boşluk
+                        treeSpacing: 200,       // Farklı ağaçlar arası boşluk
+                        blockShifting: true,
+                        edgeMinimization: true,
+                        parentCentralization: true,
+                        shakeTowards: 'leaves'
                     }
                 },
-                nodes: { shapeProperties: { interpolation: false } },
-                interaction: { hover: true, tooltipDelay: 200, zoomView: true }
+                physics: {
+                    enabled: false // Ağaç yapısında fizik kapalı olursa daha düzgün durur
+                },
+                interaction: {
+                    dragNodes: false, // Ağaç bozulmasın diye sürüklemeyi kapattım (istenirse açılabilir)
+                    hover: true,
+                    tooltipDelay: 200,
+                    zoomView: true,
+                    dragView: true
+                }
             };
 
+            // Çizimi Yap
             if (network) network.destroy();
             network = new vis.Network(container, data, options);
 
+            // Tıklama Olayı (Sidebar)
             network.on("click", function(params) {
                 if (params.nodes.length > 0) {
                     const person = allData.find(p => p.ID === params.nodes[0]);
@@ -245,23 +392,37 @@
             });
         }
 
+        // --- YARDIMCI FONKSİYONLAR ---
+        
         function handleSearch() {
+            // Yazarken anlık arama (biraz gecikmeli performans için)
             clearTimeout(window.searchTimeout);
-            window.searchTimeout = setTimeout(drawGraph, 600);
+            window.searchTimeout = setTimeout(drawTree, 500);
+        }
+
+        function resetView() {
+            document.getElementById('searchBox').value = "";
+            drawTree();
+            setTimeout(() => network.fit({animation:true}), 100);
         }
 
         function openSidebar(person) {
             const sb = document.getElementById('sidebar');
-            const initials = person.ID.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-            document.getElementById('sb-avatar').innerText = initials;
+            const imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.ID)}&background=2563eb&color=fff&size=256`;
+            
+            document.getElementById('sb-img').src = imgUrl;
             document.getElementById('sb-name').innerText = person.ID;
             document.getElementById('sb-title').innerText = person.Title;
             document.getElementById('sb-loc').innerText = person.Lokasyon;
             document.getElementById('sb-manager').innerText = person.Manager_ID || "Board";
+            
             sb.classList.add('open');
         }
 
-        function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
     </script>
 </body>
 </html>
