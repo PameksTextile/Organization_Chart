@@ -6,178 +6,660 @@
     <title>Pameks Organization Chart</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            /* PAMEKS KURUMSAL RENKLERİ */
-            --pameks-blue: #0f2b4c; /* Koyu Lacivert */
-            --pameks-red: #e30613;  /* Logodaki Kırmızı */
-            --bg-color: #eef2f6;    /* Açık Gri Zemin */
+            --pameks-blue: #0f2b4c;
+            --pameks-red: #e30613;
+            --bg-gradient-start: #0a1628;
+            --bg-gradient-end: #1a2942;
+            --card-shadow: rgba(227, 6, 19, 0.3);
+            --glow-color: rgba(227, 6, 19, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body { 
-            font-family: 'Roboto', sans-serif; 
-            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             margin: 0; 
             padding: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Sayfa kaymasın, sadece şema kaysın */
+            overflow: hidden;
+            position: relative;
         }
 
-        /* --- ÜST KONTROL PANELI --- */
+        /* ANIMATED BACKGROUND PARTICLES */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        /* GLASSMORPHISM HEADER */
         .header {
-            background: #fff;
-            padding: 15px 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             z-index: 100;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid var(--pameks-red);
+            border-bottom: 2px solid rgba(227, 6, 19, 0.3);
+            position: relative;
         }
 
-        select {
-            padding: 12px 30px;
-            font-size: 15px;
+        /* LOGO AREA */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--pameks-red) 0%, #ff3547 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 4px 15px var(--card-shadow);
+            animation: pulse-logo 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-logo {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px var(--card-shadow); }
+            50% { transform: scale(1.05); box-shadow: 0 6px 25px var(--glow-color); }
+        }
+
+        .logo-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* CONTROLS */
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        select, .zoom-btn, .theme-toggle {
+            padding: 12px 24px;
+            font-size: 14px;
             font-weight: 700;
-            color: var(--pameks-blue);
-            border: 2px solid #e0e0e0;
-            border-radius: 50px;
-            background-color: #fff;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             cursor: pointer;
             outline: none;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        select:hover {
-            border-color: var(--pameks-blue);
-            box-shadow: 0 4px 10px rgba(15, 43, 76, 0.15);
+        select:hover, .zoom-btn:hover, .theme-toggle:hover {
+            background: rgba(227, 6, 19, 0.8);
+            border-color: var(--pameks-red);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--card-shadow);
         }
 
-        /* --- ŞEMA ALANI --- */
+        select option {
+            background: var(--pameks-blue);
+            color: white;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .zoom-btn {
+            padding: 10px 16px;
+            font-size: 16px;
+        }
+
+        /* SEARCH BOX */
+        .search-container {
+            position: relative;
+        }
+
+        #searchBox {
+            padding: 12px 20px 12px 45px;
+            font-size: 14px;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            outline: none;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        #searchBox::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        #searchBox:focus {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--pameks-red);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+        }
+
+        /* CHART AREA */
         #chart_div { 
             flex: 1;
             width: 100%; 
-            overflow: auto; /* Kaydırma açık */
-            padding-top: 40px;
-            padding-bottom: 100px;
+            overflow: auto;
+            padding: 60px 40px 100px;
             text-align: center;
             cursor: grab;
-            background-image: radial-gradient(#dfe3eb 1px, transparent 1px);
-            background-size: 20px 20px; /* Arkada teknik çizim hissi veren noktalar */
+            position: relative;
+            z-index: 1;
         }
         
         #chart_div:active { cursor: grabbing; }
 
-        /* --- GOOGLE CHARTS OVERRIDE (SİHİRLİ KISIM) --- */
-        
-        table { border-collapse: separate !important; border-spacing: 0 !important; margin: 0 auto; }
+        /* CUSTOM SCROLLBAR */
+        #chart_div::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
 
-        /* Çizgilerin Rengi */
+        #chart_div::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #chart_div::-webkit-scrollbar-thumb {
+            background: var(--pameks-red);
+            border-radius: 6px;
+        }
+
+        #chart_div::-webkit-scrollbar-thumb:hover {
+            background: #ff3547;
+        }
+
+        /* CHART LINES */
+        table { 
+            border-collapse: separate !important; 
+            border-spacing: 0 !important; 
+            margin: 0 auto; 
+        }
+
         .google-visualization-orgchart-lineleft, 
         .google-visualization-orgchart-lineright, 
         .google-visualization-orgchart-linebottom { 
-            border-color: #b0b8c1 !important; 
-            border-width: 2px !important;
+            border-color: rgba(227, 6, 19, 0.4) !important; 
+            border-width: 3px !important;
+            position: relative;
         }
 
-        /* KART TASARIMI */
+        /* GLOWING LINES EFFECT */
+        .google-visualization-orgchart-lineleft::after,
+        .google-visualization-orgchart-lineright::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--pameks-red);
+            filter: blur(8px);
+            opacity: 0.3;
+            animation: line-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes line-glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* CARD CONTAINER */
         .google-visualization-orgchart-node {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
-            width: 200px; /* Geniş kartlar */
+            width: 240px !important;
+            animation: fadeInUp 0.6s ease-out backwards;
         }
 
-        /* Kartın İçeriği */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* PREMIUM CARD DESIGN */
         .card-box {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 10px 15px rgba(0,0,0,0.03);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            border-top: 4px solid var(--pameks-blue); /* Üst çizgi */
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
 
-        /* Hover Efekti: Kart yukarı kalkar */
+        /* TOP ACCENT BAR */
+        .card-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pameks-red) 0%, #ff3547 100%);
+            transition: height 0.3s ease;
+        }
+
+        /* HOVER GLOW EFFECT */
+        .card-box::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
         .google-visualization-orgchart-node:hover .card-box {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(15, 43, 76, 0.15);
-            border-top-color: var(--pameks-red); /* Üst çizgi kırmızı olur */
+            transform: translateY(-12px) scale(1.05);
+            box-shadow: 
+                0 20px 60px rgba(227, 6, 19, 0.4),
+                0 0 40px var(--glow-color),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: var(--pameks-red);
         }
 
-        /* İçerik Düzeni */
+        .google-visualization-orgchart-node:hover .card-box::before {
+            height: 100%;
+            opacity: 0.1;
+        }
+
+        .google-visualization-orgchart-node:hover .card-box::after {
+            opacity: 1;
+        }
+
+        /* CARD CONTENT */
         .card-content {
-            padding: 15px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* UNVAN (Üstte) */
+        /* AVATAR */
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pameks-red) 0%, #ff3547 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 32px;
+            color: white;
+            box-shadow: 0 4px 15px var(--card-shadow);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .google-visualization-orgchart-node:hover .avatar {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px var(--glow-color);
+        }
+
+        /* TITLE */
         .title-text { 
             font-size: 11px; 
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #8898aa;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.6);
             font-weight: 700;
             margin-bottom: 8px;
             display: block;
         }
 
-        /* İSİM (Altta) */
+        /* NAME */
         .name-text { 
-            font-size: 15px; 
+            font-size: 16px; 
             font-weight: 800; 
-            color: var(--pameks-blue);
-            line-height: 1.3;
+            color: white;
+            line-height: 1.4;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        /* Yükleniyor Yazısı */
+        /* DEPARTMENT TAG */
+        .department-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(227, 6, 19, 0.2);
+            border: 1px solid var(--pameks-red);
+            border-radius: 20px;
+            font-size: 10px;
+            color: #ff3547;
+            font-weight: 700;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* LOADING ANIMATION */
         #loading {
             margin-top: 100px;
+            font-size: 20px;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--pameks-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* STATS PANEL */
+        .stats-panel {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 20px 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 50;
+            display: flex;
+            gap: 30px;
+            animation: slideInRight 0.6s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--pameks-red);
+            display: block;
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .header {
+                flex-wrap: wrap;
+                gap: 15px;
+                justify-content: center;
+            }
+
+            .stats-panel {
+                bottom: 15px;
+                right: 15px;
+                padding: 15px 20px;
+                gap: 20px;
+            }
+
+            #searchBox {
+                width: 200px;
+            }
+
+            #searchBox:focus {
+                width: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .google-visualization-orgchart-node {
+                width: 180px !important;
+            }
+
+            .avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+
+            .name-text { font-size: 14px; }
+            .title-text { font-size: 10px; }
+
+            .stats-panel {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .logo-text {
+                font-size: 18px;
+            }
+        }
+
+        /* THEME TOGGLE */
+        .theme-toggle {
             font-size: 18px;
+        }
+
+        /* LIGHT THEME */
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        body.light-theme .header,
+        body.light-theme .card-box,
+        body.light-theme .stats-panel,
+        body.light-theme select,
+        body.light-theme .zoom-btn,
+        body.light-theme .theme-toggle,
+        body.light-theme #searchBox {
+            background: rgba(255, 255, 255, 0.8);
             color: var(--pameks-blue);
-            font-weight: 500;
-            animation: pulse 1.5s infinite;
         }
 
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        body.light-theme .logo-text,
+        body.light-theme .name-text,
+        body.light-theme #loading {
+            color: var(--pameks-blue);
         }
 
-        /* Seçili Kartın Rengi Bozulmasın */
-        .google-visualization-orgchart-node-medium {
-            vertical-align: top;
+        body.light-theme .title-text,
+        body.light-theme .stat-label {
+            color: #6c757d;
         }
-        
+
+        body.light-theme #searchBox::placeholder {
+            color: #6c757d;
+        }
+
+        body.light-theme .search-icon {
+            color: #6c757d;
+        }
+
     </style>
 </head>
 <body>
 
+    <!-- ANIMATED BACKGROUND -->
+    <div id="particles-js"></div>
+
+    <!-- HEADER -->
     <div class="header">
-        <select id="locationSelect" onchange="filterAndDraw()">
-            <option value="Istanbul">🏢 ISTANBUL HEADQUARTERS</option>
-            <option value="Malkara">🏭 MALKARA PRODUCTION</option>
-        </select>
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fas fa-sitemap"></i>
+            </div>
+            <div class="logo-text">PAMEKS</div>
+        </div>
+
+        <div class="controls">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchBox" placeholder="Search name or title..." oninput="filterAndDraw()">
+            </div>
+
+            <select id="locationSelect" onchange="filterAndDraw()">
+                <option value="Istanbul">🏢 Istanbul HQ</option>
+                <option value="Malkara">🏭 Malkara Plant</option>
+            </select>
+
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomChart(1.2)" title="Zoom In">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button class="zoom-btn" onclick="zoomChart(0.8)" title="Zoom Out">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <button class="zoom-btn" onclick="resetZoom()" title="Reset">
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+        </div>
     </div>
 
+    <!-- CHART -->
     <div id="chart_div">
-        <div id="loading">System Loading...</div>
+        <div id="loading">
+            <div class="loader"></div>
+            <div>Loading Organization Chart...</div>
+        </div>
+    </div>
+
+    <!-- STATS PANEL -->
+    <div class="stats-panel" id="statsPanel" style="display:none;">
+        <div class="stat-item">
+            <span class="stat-number" id="totalEmployees">0</span>
+            <span class="stat-label">Employees</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" id="totalDepartments">0</span>
+            <span class="stat-label">Departments</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" id="currentLocation">-</span>
+            <span class="stat-label">Location</span>
+        </div>
     </div>
 
     <script type="text/javascript">
-        // -----------------------------------------------------------
-        // BURAYA CSV LINKINI YAPISTIR
+        // PARTICLES BACKGROUND
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: '#e30613' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: false },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#e30613',
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: { enable: true, mode: 'repulse' },
+                    onclick: { enable: true, mode: 'push' },
+                    resize: true
+                }
+            },
+            retina_detect: true
+        });
+
+        // CSV LINK
         const csvLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS53ndrTBAgFEdi_57aoGwMsWukrhbuOaMUpk8haK7cB4Kc_kZVqfCLQ_OQGOWA4W-uc8PU4AMt5i3P/pub?gid=0&single=true&output=csv";
-        // -----------------------------------------------------------
 
         let allData = []; 
+        let currentZoom = 1;
 
         google.charts.load('current', {packages:["orgchart"]});
         google.charts.setOnLoadCallback(fetchData);
@@ -187,17 +669,22 @@
                 download: true,
                 header: true,
                 complete: function(results) {
-                    allData = results.data;
+                    allData = results.data.filter(item => item.ID && item.Title);
                     filterAndDraw();
                 },
                 error: function(err) {
-                    document.getElementById('loading').innerText = "Data Load Error.";
+                    console.error("CSV Error:", err);
+                    document.getElementById('loading').innerHTML = `
+                        <div class="loader"></div>
+                        <div style="color:#ff3547;">❌ Data Load Error</div>
+                    `;
                 }
             });
         }
 
         function filterAndDraw() {
             const selectedLocation = document.getElementById('locationSelect').value;
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
             const chartDiv = document.getElementById('chart_div');
             
             var data = new google.visualization.DataTable();
@@ -205,26 +692,50 @@
             data.addColumn('string', 'Manager');
             data.addColumn('string', 'ToolTip');
 
-            var filteredData = allData.filter(item => item.Lokasyon && item.Lokasyon.trim() === selectedLocation);
+            var filteredData = allData.filter(item => 
+                item.Lokasyon && 
+                item.Lokasyon.trim() === selectedLocation &&
+                (searchTerm === '' || 
+                 item.ID.toLowerCase().includes(searchTerm) || 
+                 item.Title.toLowerCase().includes(searchTerm))
+            );
 
             if (filteredData.length === 0) {
-                chartDiv.innerHTML = "<div id='loading'>No data found.</div>";
+                chartDiv.innerHTML = `
+                    <div style="margin-top:100px; text-align:center;">
+                        <div style="font-size:80px; margin-bottom:20px;">📭</div>
+                        <div style="font-size:24px; color:white; font-weight:700;">No Data Found</div>
+                        <div style="font-size:16px; color:rgba(255,255,255,0.6); margin-top:10px;">
+                            Try different filters
+                        </div>
+                    </div>
+                `;
+                document.getElementById('statsPanel').style.display = 'none';
                 return;
             }
 
-            var chartRows = filteredData.map(item => {
+            // GET INITIALS FOR AVATAR
+            function getInitials(name) {
+                return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            }
+
+            var chartRows = filteredData.map((item, index) => {
                 return [
                     { 
                         v: item.ID, 
-                        f: `<div class="card-box">
+                        f: `<div class="card-box" style="animation-delay: ${index * 0.1}s;">
                                 <div class="card-content">
+                                    <div class="avatar">
+                                        ${getInitials(item.ID)}
+                                    </div>
                                     <div class="title-text">${item.Title}</div>
                                     <div class="name-text">${item.ID}</div>
+                                    <div class="department-tag">${selectedLocation}</div>
                                 </div>
                             </div>` 
                     },
                     item.Manager_ID ? item.Manager_ID : '', 
-                    item.Title
+                    `${item.Title} - ${item.ID}`
                 ];
             });
 
@@ -237,9 +748,107 @@
                 'allowCollapse': true, 
                 'size': 'medium',
                 'nodeClass': 'google-visualization-orgchart-node',
-                'selectedNodeClass': 'google-visualization-orgchart-node' 
+                'selectedNodeClass': 'google-visualization-orgchart-node'
+            });
+
+            // UPDATE STATS
+            updateStats(filteredData, selectedLocation);
+
+            // ANIMATE CARDS WITH GSAP
+            setTimeout(() => {
+                gsap.from('.google-visualization-orgchart-node', {
+                    duration: 0.8,
+                    opacity: 0,
+                    y: 50,
+                    stagger: 0.1,
+                    ease: 'power3.out'
+                });
+            }, 100);
+        }
+
+        function updateStats(data, location) {
+            const uniqueDepartments = [...new Set(data.map(item => item.Title))].length;
+            
+            document.getElementById('totalEmployees').textContent = data.length;
+            document.getElementById('totalDepartments').textContent = uniqueDepartments;
+            document.getElementById('currentLocation').textContent = location;
+            document.getElementById('statsPanel').style.display = 'flex';
+
+            // ANIMATE NUMBERS
+            gsap.from('.stat-number', {
+                duration: 1,
+                textContent: 0,
+                snap: { textContent: 1 },
+                ease: 'power1.out'
             });
         }
+
+        // ZOOM FUNCTIONS
+        function zoomChart(factor) {
+            currentZoom *= factor;
+            currentZoom = Math.max(0.5, Math.min(currentZoom, 2)); // Limit between 0.5x - 2x
+            
+            gsap.to('#chart_div table', {
+                duration: 0.3,
+                scale: currentZoom,
+                ease: 'power2.out'
+            });
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            gsap.to('#chart_div table', {
+                duration: 0.3,
+                scale: 1,
+                ease: 'power2.out'
+            });
+        }
+
+        // THEME TOGGLE
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            const icon = document.getElementById('themeIcon');
+            
+            if (document.body.classList.contains('light-theme')) {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        }
+
+        // DRAG TO SCROLL
+        let isDown = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        const chartDiv = document.getElementById('chart_div');
+
+        chartDiv.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - chartDiv.offsetLeft;
+            startY = e.pageY - chartDiv.offsetTop;
+            scrollLeft = chartDiv.scrollLeft;
+            scrollTop = chartDiv.scrollTop;
+        });
+
+        chartDiv.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+
+        chartDiv.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+
+        chartDiv.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - chartDiv.offsetLeft;
+            const y = e.pageY - chartDiv.offsetTop;
+            const walkX = (x - startX) * 2;
+            const walkY = (y - startY) * 2;
+            chartDiv.scrollLeft = scrollLeft - walkX;
+            chartDiv.scrollTop = scrollTop - walkY;
+        });
+
     </script>
 </body>
 </html>
