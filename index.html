@@ -8,20 +8,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            /* PAMEKS GERÇEK KURUMSAL RENKLERİ */
-            --pameks-blue: #1e3a5f;      /* Ana Lacivert */
-            --pameks-blue-light: #2d5a8c; /* Açık Mavi */
-            --pameks-blue-dark: #0f2744;  /* Koyu Lacivert */
-            --pameks-accent: #4a90e2;     /* Vurgu Mavisi */
-            --bg-gradient-start: #f8f9fb;
-            --bg-gradient-end: #e8eef5;
-            --card-shadow: rgba(30, 58, 95, 0.15);
-            --glow-color: rgba(74, 144, 226, 0.4);
+            /* PAMEKS KURUMSAL RENKLERİ */
+            --pameks-blue: #1e3a5f;
+            --pameks-blue-light: #2d5a8c;
+            --pameks-blue-dark: #0f2744;
+            --pameks-red: #e74c3c;          /* Güzel kırmızı çizgiler için */
+            --pameks-red-light: #ff6b6b;
+            --bg-blue: #1e3a5f;             /* Zemin mavi */
+            --card-shadow: rgba(0, 0, 0, 0.15);
+            --glow-color: rgba(231, 76, 60, 0.4);
         }
 
         * {
@@ -31,8 +31,8 @@
         }
 
         body { 
-            font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            font-family: 'Poppins', sans-serif; 
+            background: var(--bg-blue);
             margin: 0; 
             padding: 0;
             height: 100vh;
@@ -48,21 +48,21 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.4;
+            opacity: 0.15;
         }
 
-        /* MODERN HEADER */
+        /* SOFT HEADER */
         .header {
-            background: #ffffff;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 20px 40px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             z-index: 100;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid var(--pameks-accent);
+            border-bottom: 1px solid rgba(30, 58, 95, 0.1);
             position: relative;
         }
 
@@ -74,67 +74,66 @@
         }
 
         .logo-icon {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, var(--pameks-blue) 0%, var(--pameks-blue-light) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 20px;
             color: white;
-            box-shadow: 0 4px 15px var(--card-shadow);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.2);
             transition: all 0.3s ease;
         }
 
         .logo-icon:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 25px var(--glow-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 58, 95, 0.3);
         }
 
         .logo-text {
             color: var(--pameks-blue-dark);
-            font-size: 24px;
-            font-weight: 900;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .logo-tagline {
             font-size: 11px;
-            color: #6c757d;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            color: #8898aa;
+            font-weight: 400;
+            letter-spacing: 0.3px;
             margin-top: 2px;
         }
 
-        /* CONTROLS */
+        /* SOFT CONTROLS */
         .controls {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
         }
 
         select, .zoom-btn, .theme-toggle {
-            padding: 12px 24px;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
             color: var(--pameks-blue-dark);
-            border: 2px solid #e0e7ef;
-            border-radius: 12px;
+            border: 1px solid rgba(30, 58, 95, 0.15);
+            border-radius: 10px;
             background: white;
             cursor: pointer;
             outline: none;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
 
         select:hover, .zoom-btn:hover, .theme-toggle:hover {
             background: var(--pameks-blue);
             color: white;
             border-color: var(--pameks-blue);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--card-shadow);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.2);
         }
 
         select option {
@@ -144,49 +143,51 @@
 
         .zoom-controls {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .zoom-btn {
-            padding: 10px 16px;
-            font-size: 16px;
+            padding: 8px 14px;
+            font-size: 14px;
         }
 
-        /* SEARCH BOX */
+        /* SOFT SEARCH BOX */
         .search-container {
             position: relative;
         }
 
         #searchBox {
-            padding: 12px 20px 12px 45px;
-            font-size: 14px;
+            padding: 10px 18px 10px 40px;
+            font-size: 13px;
+            font-weight: 400;
             color: var(--pameks-blue-dark);
-            border: 2px solid #e0e7ef;
-            border-radius: 12px;
+            border: 1px solid rgba(30, 58, 95, 0.15);
+            border-radius: 10px;
             background: white;
             outline: none;
-            width: 250px;
+            width: 240px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
 
         #searchBox::placeholder {
-            color: #8898aa;
+            color: #a0aec0;
+            font-weight: 300;
         }
 
         #searchBox:focus {
-            width: 300px;
-            border-color: var(--pameks-accent);
-            box-shadow: 0 4px 15px var(--glow-color);
+            width: 280px;
+            border-color: var(--pameks-blue);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.15);
         }
 
         .search-icon {
             position: absolute;
-            left: 15px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #8898aa;
-            font-size: 16px;
+            color: #a0aec0;
+            font-size: 14px;
         }
 
         /* CHART AREA */
@@ -203,27 +204,27 @@
         
         #chart_div:active { cursor: grabbing; }
 
-        /* CUSTOM SCROLLBAR */
+        /* SOFT SCROLLBAR */
         #chart_div::-webkit-scrollbar {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
         }
 
         #chart_div::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
         }
 
         #chart_div::-webkit-scrollbar-thumb {
-            background: var(--pameks-accent);
-            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
         }
 
         #chart_div::-webkit-scrollbar-thumb:hover {
-            background: var(--pameks-blue);
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        /* CHART LINES */
+        /* CHART LINES - GÜZEL KIRMIZI */
         table { 
             border-collapse: separate !important; 
             border-spacing: 0 !important; 
@@ -233,9 +234,9 @@
         .google-visualization-orgchart-lineleft, 
         .google-visualization-orgchart-lineright, 
         .google-visualization-orgchart-linebottom { 
-            border-color: var(--pameks-accent) !important; 
+            border-color: var(--pameks-red) !important; 
             border-width: 2px !important;
-            opacity: 0.6;
+            opacity: 0.8;
         }
 
         /* CARD CONTAINER */
@@ -244,14 +245,14 @@
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
-            width: 260px !important;
+            width: 240px !important;
             animation: fadeInUp 0.6s ease-out backwards;
         }
 
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -259,20 +260,18 @@
             }
         }
 
-        /* YUVARLAK PREMIUM CARD DESIGN */
+        /* SOFT YUVARLAK CARD */
         .card-box {
             background: white;
-            border-radius: 24px; /* Yuvarlak köşeler */
-            box-shadow: 
-                0 10px 30px rgba(30, 58, 95, 0.12),
-                0 1px 3px rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
-            border: 2px solid #f0f4f8;
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
-        /* TOP ACCENT BAR - İNCE ÇİZGİ */
+        /* SOFT TOP ACCENT */
         .card-box::before {
             content: '';
             position: absolute;
@@ -280,90 +279,55 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--pameks-blue) 0%, var(--pameks-accent) 100%);
-            transition: height 0.3s ease;
+            background: linear-gradient(90deg, var(--pameks-red) 0%, var(--pameks-red-light) 100%);
+            opacity: 0.8;
+            transition: all 0.3s ease;
         }
 
-        /* HOVER GLOW EFFECT */
-        .card-box::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
+        /* SOFT HOVER */
         .google-visualization-orgchart-node:hover .card-box {
-            transform: translateY(-10px) scale(1.03);
-            box-shadow: 
-                0 20px 50px rgba(30, 58, 95, 0.2),
-                0 0 30px var(--glow-color);
-            border-color: var(--pameks-accent);
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
         }
 
         .google-visualization-orgchart-node:hover .card-box::before {
-            height: 5px;
-        }
-
-        .google-visualization-orgchart-node:hover .card-box::after {
-            opacity: 0.5;
+            height: 4px;
+            opacity: 1;
         }
 
         /* CARD CONTENT */
         .card-content {
-            padding: 30px 20px;
+            padding: 24px 18px;
             position: relative;
             z-index: 1;
             text-align: center;
         }
 
-        /* TITLE - ARTIK ÇOK DAHA BELİRGİN */
+        /* SOFT TITLE - BELİRGİN */
         .title-text { 
-            font-size: 15px; 
-            font-weight: 700;
-            color: var(--pameks-blue);
-            margin-bottom: 12px;
-            display: block;
-            line-height: 1.4;
-            letter-spacing: 0.3px;
-        }
-
-        /* NAME - ALTTA */
-        .name-text { 
             font-size: 14px; 
-            font-weight: 500; 
-            color: #6c757d;
+            font-weight: 600;
+            color: var(--pameks-blue);
+            margin-bottom: 10px;
+            display: block;
             line-height: 1.5;
+            letter-spacing: 0.2px;
         }
 
-        /* DEPARTMENT TAG */
-        .department-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            background: linear-gradient(135deg, #e8f2ff 0%, #f0f7ff 100%);
-            border: 1px solid var(--pameks-accent);
-            border-radius: 20px;
-            font-size: 11px;
-            color: var(--pameks-blue);
-            font-weight: 600;
-            margin-top: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* SOFT NAME - SÖNÜK */
+        .name-text { 
+            font-size: 13px; 
+            font-weight: 400; 
+            color: #8898aa;
+            line-height: 1.6;
         }
 
         /* LOADING ANIMATION */
         #loading {
             margin-top: 100px;
-            font-size: 18px;
-            color: var(--pameks-blue);
-            font-weight: 600;
+            font-size: 16px;
+            color: white;
+            font-weight: 400;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -371,10 +335,10 @@
         }
 
         .loader {
-            width: 60px;
-            height: 60px;
-            border: 4px solid #e0e7ef;
-            border-top-color: var(--pameks-accent);
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top-color: white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -383,69 +347,12 @@
             to { transform: rotate(360deg); }
         }
 
-        /* STATS PANEL */
-        .stats-panel {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 20px;
-            border: 2px solid #e0e7ef;
-            box-shadow: 0 10px 40px rgba(30, 58, 95, 0.15);
-            z-index: 50;
-            display: flex;
-            gap: 30px;
-            animation: slideInRight 0.6s ease-out;
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 32px;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--pameks-blue) 0%, var(--pameks-accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 5px;
-            font-weight: 600;
-        }
-
         /* RESPONSIVE */
         @media (max-width: 1200px) {
             .header {
                 flex-wrap: wrap;
-                gap: 15px;
+                gap: 12px;
                 justify-content: center;
-            }
-
-            .stats-panel {
-                bottom: 15px;
-                right: 15px;
-                padding: 15px 20px;
-                gap: 20px;
             }
 
             #searchBox {
@@ -469,11 +376,6 @@
             .title-text { font-size: 13px; }
             .name-text { font-size: 12px; }
 
-            .stats-panel {
-                flex-direction: column;
-                gap: 15px;
-            }
-
             .logo-text {
                 font-size: 18px;
             }
@@ -481,19 +383,18 @@
 
         /* DARK THEME */
         body.dark-theme {
-            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            background: #0f1419;
         }
 
         body.dark-theme .header,
         body.dark-theme .card-box,
-        body.dark-theme .stats-panel,
         body.dark-theme select,
         body.dark-theme .zoom-btn,
         body.dark-theme .theme-toggle,
         body.dark-theme #searchBox {
-            background: rgba(30, 40, 55, 0.9);
+            background: rgba(30, 40, 55, 0.95);
             color: white;
-            border-color: rgba(74, 144, 226, 0.3);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         body.dark-theme .logo-text,
@@ -502,8 +403,7 @@
             color: white;
         }
 
-        body.dark-theme .name-text,
-        body.dark-theme .stat-label {
+        body.dark-theme .name-text {
             color: #8898aa;
         }
 
@@ -518,6 +418,10 @@
         body.dark-theme select option {
             background: #1e2837;
             color: white;
+        }
+
+        body.dark-theme #particles-js {
+            opacity: 0.1;
         }
 
     </style>
@@ -576,43 +480,27 @@
         </div>
     </div>
 
-    <!-- STATS PANEL -->
-    <div class="stats-panel" id="statsPanel" style="display:none;">
-        <div class="stat-item">
-            <span class="stat-number" id="totalEmployees">0</span>
-            <span class="stat-label">Employees</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number" id="totalDepartments">0</span>
-            <span class="stat-label">Departments</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number" id="currentLocation">-</span>
-            <span class="stat-label">Location</span>
-        </div>
-    </div>
-
     <script type="text/javascript">
-        // PARTICLES BACKGROUND
+        // SOFT PARTICLES BACKGROUND
         particlesJS('particles-js', {
             particles: {
-                number: { value: 60, density: { enable: true, value_area: 800 } },
-                color: { value: '#4a90e2' },
+                number: { value: 50, density: { enable: true, value_area: 800 } },
+                color: { value: '#ffffff' },
                 shape: { type: 'circle' },
-                opacity: { value: 0.4, random: false },
-                size: { value: 3, random: true },
+                opacity: { value: 0.3, random: true },
+                size: { value: 2, random: true },
                 line_linked: {
                     enable: true,
                     distance: 150,
-                    color: '#4a90e2',
-                    opacity: 0.3,
+                    color: '#ffffff',
+                    opacity: 0.2,
                     width: 1
                 },
                 move: {
                     enable: true,
-                    speed: 1.5,
+                    speed: 1,
                     direction: 'none',
-                    random: false,
+                    random: true,
                     straight: false,
                     out_mode: 'out',
                     bounce: false
@@ -622,13 +510,13 @@
                 detect_on: 'canvas',
                 events: {
                     onhover: { enable: true, mode: 'grab' },
-                    onclick: { enable: true, mode: 'push' },
+                    onclick: { enable: false },
                     resize: true
                 },
                 modes: {
                     grab: {
-                        distance: 140,
-                        line_linked: { opacity: 0.5 }
+                        distance: 120,
+                        line_linked: { opacity: 0.4 }
                     }
                 }
             },
@@ -650,20 +538,62 @@
                 header: true,
                 complete: function(results) {
                     allData = results.data.filter(item => item.ID && item.Title && item.Lokasyon);
-                    console.log("Data loaded:", allData.length, "records");
+                    console.log("✅ Data loaded:", allData.length, "records");
                     filterAndDraw();
                 },
                 error: function(err) {
-                    console.error("CSV Error:", err);
+                    console.error("❌ CSV Error:", err);
                     document.getElementById('loading').innerHTML = `
                         <div class="loader"></div>
-                        <div style="color:#e74c3c;">❌ Data Load Error</div>
-                        <div style="font-size:14px; color:#6c757d; margin-top:10px;">
-                            Please check CSV link and console
+                        <div style="color:#ff6b6b; margin-top:10px;">Data Load Error</div>
+                        <div style="font-size:13px; color:rgba(255,255,255,0.6); margin-top:8px;">
+                            Please check CSV link
                         </div>
                     `;
                 }
             });
+        }
+
+        // AĞAÇ YAPISI İLE FİLTRELEME - ÜSTÜNÜ KORUR
+        function getHierarchyTree(data, searchTerm) {
+            if (!searchTerm) return data;
+
+            // Arama terimine uyan kişileri bul
+            const matchedItems = data.filter(item => 
+                item.ID.toLowerCase().includes(searchTerm) || 
+                item.Title.toLowerCase().includes(searchTerm)
+            );
+
+            if (matchedItems.length === 0) return [];
+
+            // Eşleşen her kişi için üst ağacı topla
+            const hierarchySet = new Set();
+            
+            matchedItems.forEach(matchedItem => {
+                // Kendisini ekle
+                hierarchySet.add(matchedItem.ID);
+                
+                // Üst yöneticilerini ekle (recursive)
+                let currentManager = matchedItem.Manager_ID;
+                while (currentManager) {
+                    hierarchySet.add(currentManager);
+                    const manager = data.find(item => item.ID === currentManager);
+                    currentManager = manager ? manager.Manager_ID : null;
+                }
+
+                // Alt çalışanlarını ekle (recursive)
+                function addSubordinates(managerId) {
+                    const subordinates = data.filter(item => item.Manager_ID === managerId);
+                    subordinates.forEach(sub => {
+                        hierarchySet.add(sub.ID);
+                        addSubordinates(sub.ID);
+                    });
+                }
+                addSubordinates(matchedItem.ID);
+            });
+
+            // Set'i array'e çevir ve data'dan filtrele
+            return data.filter(item => hierarchySet.has(item.ID));
         }
 
         function filterAndDraw() {
@@ -676,25 +606,25 @@
             data.addColumn('string', 'Manager');
             data.addColumn('string', 'ToolTip');
 
-            var filteredData = allData.filter(item => 
+            // Önce lokasyona göre filtrele
+            var locationFiltered = allData.filter(item => 
                 item.Lokasyon && 
-                item.Lokasyon.trim() === selectedLocation &&
-                (searchTerm === '' || 
-                 item.ID.toLowerCase().includes(searchTerm) || 
-                 item.Title.toLowerCase().includes(searchTerm))
+                item.Lokasyon.trim() === selectedLocation
             );
+
+            // Sonra ağaç yapısını koruyarak ara
+            var filteredData = getHierarchyTree(locationFiltered, searchTerm);
 
             if (filteredData.length === 0) {
                 chartDiv.innerHTML = `
                     <div style="margin-top:100px; text-align:center;">
-                        <div style="font-size:80px; margin-bottom:20px;">📭</div>
-                        <div style="font-size:24px; color:var(--pameks-blue); font-weight:700;">No Data Found</div>
-                        <div style="font-size:16px; color:#6c757d; margin-top:10px;">
-                            Try different filters or check your data
+                        <div style="font-size:60px; margin-bottom:20px; opacity:0.5;">🔍</div>
+                        <div style="font-size:20px; color:white; font-weight:500;">No Results Found</div>
+                        <div style="font-size:14px; color:rgba(255,255,255,0.6); margin-top:8px; font-weight:300;">
+                            Try different search terms
                         </div>
                     </div>
                 `;
-                document.getElementById('statsPanel').style.display = 'none';
                 return;
             }
 
@@ -702,19 +632,15 @@
                 return [
                     { 
                         v: item.ID, 
-                        f: `<div class="card-box" style="animation-delay: ${index * 0.05}s;">
+                        f: `<div class="card-box" style="animation-delay: ${index * 0.04}s;">
                                 <div class="card-content">
                                     <div class="title-text">${item.Title}</div>
                                     <div class="name-text">${item.ID}</div>
-                                    <div class="department-tag">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        ${selectedLocation}
-                                    </div>
                                 </div>
                             </div>` 
                     },
                     item.Manager_ID ? item.Manager_ID : '', 
-                    `${item.Title}\n${item.ID}\n${selectedLocation}`
+                    `${item.Title}\n${item.ID}`
                 ];
             });
 
@@ -730,37 +656,16 @@
                 'selectedNodeClass': 'google-visualization-orgchart-node'
             });
 
-            // UPDATE STATS
-            updateStats(filteredData, selectedLocation);
-
-            // ANIMATE CARDS WITH GSAP
+            // SOFT ANIMATE
             setTimeout(() => {
                 gsap.from('.google-visualization-orgchart-node', {
-                    duration: 0.8,
+                    duration: 0.6,
                     opacity: 0,
-                    y: 50,
-                    stagger: 0.08,
-                    ease: 'power3.out'
+                    y: 30,
+                    stagger: 0.05,
+                    ease: 'power2.out'
                 });
             }, 100);
-        }
-
-        function updateStats(data, location) {
-            const uniqueDepartments = [...new Set(data.map(item => item.Title))].length;
-            
-            document.getElementById('totalEmployees').textContent = data.length;
-            document.getElementById('totalDepartments').textContent = uniqueDepartments;
-            document.getElementById('currentLocation').textContent = location;
-            document.getElementById('statsPanel').style.display = 'flex';
-
-            // ANIMATE NUMBERS
-            gsap.from('.stat-number', {
-                duration: 1.2,
-                textContent: 0,
-                snap: { textContent: 1 },
-                ease: 'power2.out',
-                stagger: 0.2
-            });
         }
 
         // ZOOM FUNCTIONS
@@ -796,7 +701,7 @@
             }
         }
 
-        // DRAG TO SCROLL
+        // SMOOTH DRAG TO SCROLL
         let isDown = false;
         let startX, startY, scrollLeft, scrollTop;
 
@@ -827,8 +732,8 @@
             e.preventDefault();
             const x = e.pageX - chartDiv.offsetLeft;
             const y = e.pageY - chartDiv.offsetTop;
-            const walkX = (x - startX) * 2;
-            const walkY = (y - startY) * 2;
+            const walkX = (x - startX) * 1.5;
+            const walkY = (y - startY) * 1.5;
             chartDiv.scrollLeft = scrollLeft - walkX;
             chartDiv.scrollTop = scrollTop - walkY;
         });
