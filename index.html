@@ -3,88 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organization Chart</title>
+    <title>Corporate Organization Chart</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* GENEL SAYFA AYARLARI */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f4f6f9; 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8f9fa; /* Çok açık gri arka plan */
             margin: 0; 
-            padding: 20px; 
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            height: 100vh;
         }
 
-        /* Dropdown Style */
+        /* ÜST MENÜ VE SEÇİM ALANI */
         .controls {
-            margin-bottom: 30px;
+            background: white;
+            width: 100%;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         select {
-            padding: 12px 20px;
-            font-size: 16px;
-            border: 2px solid #007bff;
-            border-radius: 8px;
-            background-color: white;
+            padding: 10px 20px;
+            font-size: 15px;
+            border: 1px solid #e1e4e8;
+            border-radius: 20px;
+            background-color: #f1f3f5;
             color: #333;
             cursor: pointer;
             outline: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s;
             font-weight: 600;
+            transition: all 0.2s;
         }
 
         select:hover {
-            border-color: #0056b3;
+            background-color: #e9ecef;
         }
 
-        /* Chart Container */
+        /* ŞEMA ALANI */
         #chart_div { 
             width: 100%; 
-            overflow-x: auto; 
+            height: 100%;
+            overflow: auto; /* Mobilde kaydırma açar */
             text-align: center;
-            padding-bottom: 50px;
+            padding-top: 30px;
+            padding-bottom: 100px;
+            /* Dokunmatik ekranlarda kaydırmayı yumuşatır */
+            -webkit-overflow-scrolling: touch; 
         }
+
+        /* --- GOOGLE CHARTS ÖZELLEŞTİRME (EN ÖNEMLİ KISIM) --- */
         
-        /* Node (Box) Design */
+        /* Tablo çizgilerini temizle */
+        table { border-collapse: separate !important; border-spacing: 0 !important; }
+
+        /* Bağlantı çizgileri rengi */
+        .google-visualization-orgchart-lineleft, 
+        .google-visualization-orgchart-lineright, 
+        .google-visualization-orgchart-linebottom { 
+            border-color: #cbd5e1 !important; 
+            border-width: 2px !important;
+        }
+
+        /* KART TASARIMI */
         .google-visualization-orgchart-node {
             background: #ffffff; 
-            border: 0; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-            padding: 15px;
-            border-top: 4px solid #007bff; /* Blue top border */
-            width: 160px; /* Fixed width for better look */
+            border: none !important; /* Eski kenarlığı kaldır */
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1); 
+            padding: 0 !important;
+            width: 180px; 
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
+        /* Kartın üzerine gelince */
+        .google-visualization-orgchart-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            z-index: 999;
+        }
+
+        /* Seçili/Tıklanmış Kart */
         .google-visualization-orgchart-node-medium {
-            font-size: 14px;
+            vertical-align: middle;
+            text-align: center;
         }
 
-        .name-text { 
-            font-size: 15px; 
-            font-weight: 700; 
-            color: #2c3e50; 
-            margin-bottom: 5px;
-            line-height: 1.3;
+        /* İÇERİK DÜZENİ */
+        .node-content {
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        
+
+        /* Önce UNVAN (Title) */
         .title-text { 
-            font-size: 13px; 
-            color: #7f8c8d; 
-            font-style: normal;
-            line-height: 1.2;
+            font-size: 11px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b; /* Gri renk */
+            margin-bottom: 6px;
+            font-weight: 600;
         }
 
-        /* Loading Text */
+        /* Sonra İSİM (Name) */
+        .name-text { 
+            font-size: 14px; 
+            font-weight: 700; 
+            color: #1e293b; /* Koyu lacivert/siyah */
+            line-height: 1.4;
+        }
+
+        /* Yükleniyor yazısı */
         #loading {
-            font-size: 18px;
-            color: #666;
             margin-top: 50px;
+            color: #64748b;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* MOBİL UYUM (Responsive) */
+        @media (max-width: 768px) {
+            .google-visualization-orgchart-node {
+                width: 140px; /* Mobilde kutular biraz daha dar olsun */
+            }
+            .name-text { font-size: 13px; }
+            .title-text { font-size: 10px; }
         }
     </style>
 </head>
@@ -92,18 +149,18 @@
 
     <div class="controls">
         <select id="locationSelect" onchange="filterAndDraw()">
-            <option value="Istanbul">Istanbul HQ</option>
-            <option value="Malkara">Malkara Production</option>
+            <option value="Istanbul">📍 Istanbul HQ</option>
+            <option value="Malkara">🏭 Malkara Production</option>
         </select>
     </div>
 
     <div id="chart_div">
-        <div id="loading">Loading data...</div>
+        <div id="loading">Loading organization chart...</div>
     </div>
 
     <script type="text/javascript">
         // -----------------------------------------------------------
-        // PASTE YOUR GOOGLE SHEET CSV LINK HERE
+        // BURAYA CSV LINKINI YAPISTIR
         const csvLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS53ndrTBAgFEdi_57aoGwMsWukrhbuOaMUpk8haK7cB4Kc_kZVqfCLQ_OQGOWA4W-uc8PU4AMt5i3P/pub?gid=0&single=true&output=csv";
         // -----------------------------------------------------------
 
@@ -112,28 +169,22 @@
         google.charts.load('current', {packages:["orgchart"]});
         google.charts.setOnLoadCallback(fetchData);
 
-        // 1. Fetch Data Once
         function fetchData() {
             Papa.parse(csvLink, {
                 download: true,
                 header: true,
                 complete: function(results) {
                     allData = results.data;
-                    // Automatically load the selected option (Istanbul by default)
                     filterAndDraw();
                 },
                 error: function(err) {
-                    document.getElementById('loading').innerText = "Error loading data. Please check the link.";
-                    console.error("CSV Error:", err);
+                    document.getElementById('loading').innerText = "Error loading data.";
                 }
             });
         }
 
-        // 2. Filter and Draw Chart based on Dropdown Selection
         function filterAndDraw() {
             const selectedLocation = document.getElementById('locationSelect').value;
-            
-            // Clear previous chart or loading text
             const chartDiv = document.getElementById('chart_div');
             
             var data = new google.visualization.DataTable();
@@ -141,12 +192,10 @@
             data.addColumn('string', 'Manager');
             data.addColumn('string', 'ToolTip');
 
-            // Filter data matches the CSV 'Lokasyon' column text
-            // Note: Ensure your CSV has 'Istanbul' and 'Malkara' exactly as values in 'Lokasyon' column
             var filteredData = allData.filter(item => item.Lokasyon && item.Lokasyon.trim() === selectedLocation);
 
             if (filteredData.length === 0) {
-                chartDiv.innerHTML = "<div id='loading'>No data found for this location.</div>";
+                chartDiv.innerHTML = "<div id='loading'>No data found.</div>";
                 return;
             }
 
@@ -154,7 +203,10 @@
                 return [
                     { 
                         v: item.ID, 
-                        f: `<div class="name-text">${item.ID}</div><div class="title-text">${item.Title}</div>` 
+                        f: `<div class="node-content">
+                                <div class="title-text">${item.Title}</div>
+                                <div class="name-text">${item.ID}</div>
+                            </div>` 
                     },
                     item.Manager_ID ? item.Manager_ID : '', 
                     item.Title
@@ -164,7 +216,15 @@
             data.addRows(chartRows);
 
             var chart = new google.visualization.OrgChart(chartDiv);
-            chart.draw(data, {'allowHtml':true, 'size': 'medium'});
+            
+            // AYARLAR
+            chart.draw(data, {
+                'allowHtml': true, 
+                'allowCollapse': true, // İNTERAKTİFLİK: Çift tıklayınca kapanır
+                'size': 'medium',
+                'nodeClass': 'google-visualization-orgchart-node',
+                'selectedNodeClass': 'google-visualization-orgchart-node' // Seçilince stil bozulmasın
+            });
         }
     </script>
 </body>
