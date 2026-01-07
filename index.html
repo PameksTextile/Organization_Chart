@@ -13,12 +13,15 @@
     
     <style>
         :root {
-            --pameks-blue: #0f2b4c;
-            --pameks-red: #e30613;
-            --bg-gradient-start: #0a1628;
-            --bg-gradient-end: #1a2942;
-            --card-shadow: rgba(227, 6, 19, 0.3);
-            --glow-color: rgba(227, 6, 19, 0.6);
+            /* PAMEKS GERÇEK KURUMSAL RENKLERİ */
+            --pameks-blue: #1e3a5f;      /* Ana Lacivert */
+            --pameks-blue-light: #2d5a8c; /* Açık Mavi */
+            --pameks-blue-dark: #0f2744;  /* Koyu Lacivert */
+            --pameks-accent: #4a90e2;     /* Vurgu Mavisi */
+            --bg-gradient-start: #f8f9fb;
+            --bg-gradient-end: #e8eef5;
+            --card-shadow: rgba(30, 58, 95, 0.15);
+            --glow-color: rgba(74, 144, 226, 0.4);
         }
 
         * {
@@ -45,21 +48,21 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            opacity: 0.3;
+            opacity: 0.4;
         }
 
-        /* GLASSMORPHISM HEADER */
+        /* MODERN HEADER */
         .header {
-            background: rgba(255, 255, 255, 0.05);
+            background: #ffffff;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 20px 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             z-index: 100;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid rgba(227, 6, 19, 0.3);
+            border-bottom: 3px solid var(--pameks-accent);
             position: relative;
         }
 
@@ -73,7 +76,7 @@
         .logo-icon {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, var(--pameks-red) 0%, #ff3547 100%);
+            background: linear-gradient(135deg, var(--pameks-blue) 0%, var(--pameks-blue-light) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -81,20 +84,28 @@
             font-size: 24px;
             color: white;
             box-shadow: 0 4px 15px var(--card-shadow);
-            animation: pulse-logo 2s ease-in-out infinite;
+            transition: all 0.3s ease;
         }
 
-        @keyframes pulse-logo {
-            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px var(--card-shadow); }
-            50% { transform: scale(1.05); box-shadow: 0 6px 25px var(--glow-color); }
+        .logo-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px var(--glow-color);
         }
 
         .logo-text {
-            color: white;
+            color: var(--pameks-blue-dark);
             font-size: 24px;
             font-weight: 900;
             letter-spacing: 1px;
             text-transform: uppercase;
+        }
+
+        .logo-tagline {
+            font-size: 11px;
+            color: #6c757d;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
         }
 
         /* CONTROLS */
@@ -107,28 +118,28 @@
         select, .zoom-btn, .theme-toggle {
             padding: 12px 24px;
             font-size: 14px;
-            font-weight: 700;
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+            color: var(--pameks-blue-dark);
+            border: 2px solid #e0e7ef;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: white;
             cursor: pointer;
             outline: none;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         select:hover, .zoom-btn:hover, .theme-toggle:hover {
-            background: rgba(227, 6, 19, 0.8);
-            border-color: var(--pameks-red);
+            background: var(--pameks-blue);
+            color: white;
+            border-color: var(--pameks-blue);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px var(--card-shadow);
         }
 
         select option {
-            background: var(--pameks-blue);
-            color: white;
+            background: white;
+            color: var(--pameks-blue-dark);
         }
 
         .zoom-controls {
@@ -149,25 +160,24 @@
         #searchBox {
             padding: 12px 20px 12px 45px;
             font-size: 14px;
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: var(--pameks-blue-dark);
+            border: 2px solid #e0e7ef;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: white;
             outline: none;
             width: 250px;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         #searchBox::placeholder {
-            color: rgba(255, 255, 255, 0.6);
+            color: #8898aa;
         }
 
         #searchBox:focus {
             width: 300px;
-            background: rgba(255, 255, 255, 0.15);
-            border-color: var(--pameks-red);
-            box-shadow: 0 0 20px var(--glow-color);
+            border-color: var(--pameks-accent);
+            box-shadow: 0 4px 15px var(--glow-color);
         }
 
         .search-icon {
@@ -175,7 +185,7 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.6);
+            color: #8898aa;
             font-size: 16px;
         }
 
@@ -200,16 +210,17 @@
         }
 
         #chart_div::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
         }
 
         #chart_div::-webkit-scrollbar-thumb {
-            background: var(--pameks-red);
+            background: var(--pameks-accent);
             border-radius: 6px;
         }
 
         #chart_div::-webkit-scrollbar-thumb:hover {
-            background: #ff3547;
+            background: var(--pameks-blue);
         }
 
         /* CHART LINES */
@@ -222,27 +233,9 @@
         .google-visualization-orgchart-lineleft, 
         .google-visualization-orgchart-lineright, 
         .google-visualization-orgchart-linebottom { 
-            border-color: rgba(227, 6, 19, 0.4) !important; 
-            border-width: 3px !important;
-            position: relative;
-        }
-
-        /* GLOWING LINES EFFECT */
-        .google-visualization-orgchart-lineleft::after,
-        .google-visualization-orgchart-lineright::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: var(--pameks-red);
-            filter: blur(8px);
-            opacity: 0.3;
-            animation: line-glow 2s ease-in-out infinite;
-        }
-
-        @keyframes line-glow {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
+            border-color: var(--pameks-accent) !important; 
+            border-width: 2px !important;
+            opacity: 0.6;
         }
 
         /* CARD CONTAINER */
@@ -251,7 +244,7 @@
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
-            width: 240px !important;
+            width: 260px !important;
             animation: fadeInUp 0.6s ease-out backwards;
         }
 
@@ -266,30 +259,28 @@
             }
         }
 
-        /* PREMIUM CARD DESIGN */
+        /* YUVARLAK PREMIUM CARD DESIGN */
         .card-box {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 16px;
+            background: white;
+            border-radius: 24px; /* Yuvarlak köşeler */
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                0 10px 30px rgba(30, 58, 95, 0.12),
+                0 1px 3px rgba(0, 0, 0, 0.08);
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 2px solid #f0f4f8;
         }
 
-        /* TOP ACCENT BAR */
+        /* TOP ACCENT BAR - İNCE ÇİZGİ */
         .card-box::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--pameks-red) 0%, #ff3547 100%);
+            height: 3px;
+            background: linear-gradient(90deg, var(--pameks-blue) 0%, var(--pameks-accent) 100%);
             transition: height 0.3s ease;
         }
 
@@ -304,86 +295,65 @@
             background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
             opacity: 0;
             transition: opacity 0.4s ease;
+            pointer-events: none;
         }
 
         .google-visualization-orgchart-node:hover .card-box {
-            transform: translateY(-12px) scale(1.05);
+            transform: translateY(-10px) scale(1.03);
             box-shadow: 
-                0 20px 60px rgba(227, 6, 19, 0.4),
-                0 0 40px var(--glow-color),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            border-color: var(--pameks-red);
+                0 20px 50px rgba(30, 58, 95, 0.2),
+                0 0 30px var(--glow-color);
+            border-color: var(--pameks-accent);
         }
 
         .google-visualization-orgchart-node:hover .card-box::before {
-            height: 100%;
-            opacity: 0.1;
+            height: 5px;
         }
 
         .google-visualization-orgchart-node:hover .card-box::after {
-            opacity: 1;
+            opacity: 0.5;
         }
 
         /* CARD CONTENT */
         .card-content {
-            padding: 20px;
+            padding: 30px 20px;
             position: relative;
             z-index: 1;
+            text-align: center;
         }
 
-        /* AVATAR */
-        .avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--pameks-red) 0%, #ff3547 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            font-size: 32px;
-            color: white;
-            box-shadow: 0 4px 15px var(--card-shadow);
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .google-visualization-orgchart-node:hover .avatar {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 8px 25px var(--glow-color);
-        }
-
-        /* TITLE */
+        /* TITLE - ARTIK ÇOK DAHA BELİRGİN */
         .title-text { 
-            font-size: 11px; 
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px; 
             font-weight: 700;
-            margin-bottom: 8px;
+            color: var(--pameks-blue);
+            margin-bottom: 12px;
             display: block;
+            line-height: 1.4;
+            letter-spacing: 0.3px;
         }
 
-        /* NAME */
+        /* NAME - ALTTA */
         .name-text { 
-            font-size: 16px; 
-            font-weight: 800; 
-            color: white;
-            line-height: 1.4;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 14px; 
+            font-weight: 500; 
+            color: #6c757d;
+            line-height: 1.5;
         }
 
         /* DEPARTMENT TAG */
         .department-tag {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(227, 6, 19, 0.2);
-            border: 1px solid var(--pameks-red);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #e8f2ff 0%, #f0f7ff 100%);
+            border: 1px solid var(--pameks-accent);
             border-radius: 20px;
-            font-size: 10px;
-            color: #ff3547;
-            font-weight: 700;
-            margin-top: 10px;
+            font-size: 11px;
+            color: var(--pameks-blue);
+            font-weight: 600;
+            margin-top: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -391,8 +361,8 @@
         /* LOADING ANIMATION */
         #loading {
             margin-top: 100px;
-            font-size: 20px;
-            color: white;
+            font-size: 18px;
+            color: var(--pameks-blue);
             font-weight: 600;
             display: flex;
             flex-direction: column;
@@ -403,8 +373,8 @@
         .loader {
             width: 60px;
             height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top-color: var(--pameks-red);
+            border: 4px solid #e0e7ef;
+            border-top-color: var(--pameks-accent);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -418,12 +388,11 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
+            background: white;
             padding: 20px 30px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 2px solid #e0e7ef;
+            box-shadow: 0 10px 40px rgba(30, 58, 95, 0.15);
             z-index: 50;
             display: flex;
             gap: 30px;
@@ -446,19 +415,22 @@
         }
 
         .stat-number {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 900;
-            color: var(--pameks-red);
+            background: linear-gradient(135deg, var(--pameks-blue) 0%, var(--pameks-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             display: block;
-            text-shadow: 0 0 10px var(--glow-color);
         }
 
         .stat-label {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            color: #6c757d;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-top: 5px;
+            font-weight: 600;
         }
 
         /* RESPONSIVE */
@@ -487,17 +459,15 @@
 
         @media (max-width: 768px) {
             .google-visualization-orgchart-node {
-                width: 180px !important;
+                width: 200px !important;
             }
 
-            .avatar {
-                width: 60px;
-                height: 60px;
-                font-size: 28px;
+            .card-content {
+                padding: 20px 15px;
             }
 
-            .name-text { font-size: 14px; }
-            .title-text { font-size: 10px; }
+            .title-text { font-size: 13px; }
+            .name-text { font-size: 12px; }
 
             .stats-panel {
                 flex-direction: column;
@@ -509,44 +479,45 @@
             }
         }
 
-        /* THEME TOGGLE */
-        .theme-toggle {
-            font-size: 18px;
+        /* DARK THEME */
+        body.dark-theme {
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
         }
 
-        /* LIGHT THEME */
-        body.light-theme {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        body.dark-theme .header,
+        body.dark-theme .card-box,
+        body.dark-theme .stats-panel,
+        body.dark-theme select,
+        body.dark-theme .zoom-btn,
+        body.dark-theme .theme-toggle,
+        body.dark-theme #searchBox {
+            background: rgba(30, 40, 55, 0.9);
+            color: white;
+            border-color: rgba(74, 144, 226, 0.3);
         }
 
-        body.light-theme .header,
-        body.light-theme .card-box,
-        body.light-theme .stats-panel,
-        body.light-theme select,
-        body.light-theme .zoom-btn,
-        body.light-theme .theme-toggle,
-        body.light-theme #searchBox {
-            background: rgba(255, 255, 255, 0.8);
-            color: var(--pameks-blue);
+        body.dark-theme .logo-text,
+        body.dark-theme .title-text,
+        body.dark-theme #loading {
+            color: white;
         }
 
-        body.light-theme .logo-text,
-        body.light-theme .name-text,
-        body.light-theme #loading {
-            color: var(--pameks-blue);
+        body.dark-theme .name-text,
+        body.dark-theme .stat-label {
+            color: #8898aa;
         }
 
-        body.light-theme .title-text,
-        body.light-theme .stat-label {
+        body.dark-theme #searchBox::placeholder {
             color: #6c757d;
         }
 
-        body.light-theme #searchBox::placeholder {
+        body.dark-theme .search-icon {
             color: #6c757d;
         }
 
-        body.light-theme .search-icon {
-            color: #6c757d;
+        body.dark-theme select option {
+            background: #1e2837;
+            color: white;
         }
 
     </style>
@@ -562,7 +533,10 @@
             <div class="logo-icon">
                 <i class="fas fa-sitemap"></i>
             </div>
-            <div class="logo-text">PAMEKS</div>
+            <div>
+                <div class="logo-text">PAMEKS</div>
+                <div class="logo-tagline">Organization Structure</div>
+            </div>
         </div>
 
         <div class="controls">
@@ -622,21 +596,21 @@
         // PARTICLES BACKGROUND
         particlesJS('particles-js', {
             particles: {
-                number: { value: 80, density: { enable: true, value_area: 800 } },
-                color: { value: '#e30613' },
+                number: { value: 60, density: { enable: true, value_area: 800 } },
+                color: { value: '#4a90e2' },
                 shape: { type: 'circle' },
-                opacity: { value: 0.5, random: false },
+                opacity: { value: 0.4, random: false },
                 size: { value: 3, random: true },
                 line_linked: {
                     enable: true,
                     distance: 150,
-                    color: '#e30613',
-                    opacity: 0.4,
+                    color: '#4a90e2',
+                    opacity: 0.3,
                     width: 1
                 },
                 move: {
                     enable: true,
-                    speed: 2,
+                    speed: 1.5,
                     direction: 'none',
                     random: false,
                     straight: false,
@@ -647,9 +621,15 @@
             interactivity: {
                 detect_on: 'canvas',
                 events: {
-                    onhover: { enable: true, mode: 'repulse' },
+                    onhover: { enable: true, mode: 'grab' },
                     onclick: { enable: true, mode: 'push' },
                     resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 140,
+                        line_linked: { opacity: 0.5 }
+                    }
                 }
             },
             retina_detect: true
@@ -669,14 +649,18 @@
                 download: true,
                 header: true,
                 complete: function(results) {
-                    allData = results.data.filter(item => item.ID && item.Title);
+                    allData = results.data.filter(item => item.ID && item.Title && item.Lokasyon);
+                    console.log("Data loaded:", allData.length, "records");
                     filterAndDraw();
                 },
                 error: function(err) {
                     console.error("CSV Error:", err);
                     document.getElementById('loading').innerHTML = `
                         <div class="loader"></div>
-                        <div style="color:#ff3547;">❌ Data Load Error</div>
+                        <div style="color:#e74c3c;">❌ Data Load Error</div>
+                        <div style="font-size:14px; color:#6c757d; margin-top:10px;">
+                            Please check CSV link and console
+                        </div>
                     `;
                 }
             });
@@ -704,9 +688,9 @@
                 chartDiv.innerHTML = `
                     <div style="margin-top:100px; text-align:center;">
                         <div style="font-size:80px; margin-bottom:20px;">📭</div>
-                        <div style="font-size:24px; color:white; font-weight:700;">No Data Found</div>
-                        <div style="font-size:16px; color:rgba(255,255,255,0.6); margin-top:10px;">
-                            Try different filters
+                        <div style="font-size:24px; color:var(--pameks-blue); font-weight:700;">No Data Found</div>
+                        <div style="font-size:16px; color:#6c757d; margin-top:10px;">
+                            Try different filters or check your data
                         </div>
                     </div>
                 `;
@@ -714,28 +698,23 @@
                 return;
             }
 
-            // GET INITIALS FOR AVATAR
-            function getInitials(name) {
-                return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            }
-
             var chartRows = filteredData.map((item, index) => {
                 return [
                     { 
                         v: item.ID, 
-                        f: `<div class="card-box" style="animation-delay: ${index * 0.1}s;">
+                        f: `<div class="card-box" style="animation-delay: ${index * 0.05}s;">
                                 <div class="card-content">
-                                    <div class="avatar">
-                                        ${getInitials(item.ID)}
-                                    </div>
                                     <div class="title-text">${item.Title}</div>
                                     <div class="name-text">${item.ID}</div>
-                                    <div class="department-tag">${selectedLocation}</div>
+                                    <div class="department-tag">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        ${selectedLocation}
+                                    </div>
                                 </div>
                             </div>` 
                     },
                     item.Manager_ID ? item.Manager_ID : '', 
-                    `${item.Title} - ${item.ID}`
+                    `${item.Title}\n${item.ID}\n${selectedLocation}`
                 ];
             });
 
@@ -760,7 +739,7 @@
                     duration: 0.8,
                     opacity: 0,
                     y: 50,
-                    stagger: 0.1,
+                    stagger: 0.08,
                     ease: 'power3.out'
                 });
             }, 100);
@@ -776,17 +755,18 @@
 
             // ANIMATE NUMBERS
             gsap.from('.stat-number', {
-                duration: 1,
+                duration: 1.2,
                 textContent: 0,
                 snap: { textContent: 1 },
-                ease: 'power1.out'
+                ease: 'power2.out',
+                stagger: 0.2
             });
         }
 
         // ZOOM FUNCTIONS
         function zoomChart(factor) {
             currentZoom *= factor;
-            currentZoom = Math.max(0.5, Math.min(currentZoom, 2)); // Limit between 0.5x - 2x
+            currentZoom = Math.max(0.5, Math.min(currentZoom, 2.5));
             
             gsap.to('#chart_div table', {
                 duration: 0.3,
@@ -806,10 +786,10 @@
 
         // THEME TOGGLE
         function toggleTheme() {
-            document.body.classList.toggle('light-theme');
+            document.body.classList.toggle('dark-theme');
             const icon = document.getElementById('themeIcon');
             
-            if (document.body.classList.contains('light-theme')) {
+            if (document.body.classList.contains('dark-theme')) {
                 icon.className = 'fas fa-sun';
             } else {
                 icon.className = 'fas fa-moon';
@@ -823,7 +803,9 @@
         const chartDiv = document.getElementById('chart_div');
 
         chartDiv.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.google-visualization-orgchart-node')) return;
             isDown = true;
+            chartDiv.style.cursor = 'grabbing';
             startX = e.pageX - chartDiv.offsetLeft;
             startY = e.pageY - chartDiv.offsetTop;
             scrollLeft = chartDiv.scrollLeft;
@@ -832,10 +814,12 @@
 
         chartDiv.addEventListener('mouseleave', () => {
             isDown = false;
+            chartDiv.style.cursor = 'grab';
         });
 
         chartDiv.addEventListener('mouseup', () => {
             isDown = false;
+            chartDiv.style.cursor = 'grab';
         });
 
         chartDiv.addEventListener('mousemove', (e) => {
