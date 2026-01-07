@@ -3,165 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corporate Organization Chart</title>
+    <title>Pameks Organization Chart</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* GENEL SAYFA AYARLARI */
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f8f9fa; /* Çok açık gri arka plan */
-            margin: 0; 
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
+        :root {
+            /* PAMEKS KURUMSAL RENKLERİ */
+            --pameks-blue: #0f2b4c; /* Koyu Lacivert */
+            --pameks-red: #e30613;  /* Logodaki Kırmızı */
+            --bg-color: #eef2f6;    /* Açık Gri Zemin */
         }
 
-        /* ÜST MENÜ VE SEÇİM ALANI */
-        .controls {
-            background: white;
-            width: 100%;
-            padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-color);
+            margin: 0; 
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Sayfa kaymasın, sadece şema kaysın */
+        }
+
+        /* --- ÜST KONTROL PANELI --- */
+        .header {
+            background: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 3px solid var(--pameks-red);
         }
 
         select {
-            padding: 10px 20px;
+            padding: 12px 30px;
             font-size: 15px;
-            border: 1px solid #e1e4e8;
-            border-radius: 20px;
-            background-color: #f1f3f5;
-            color: #333;
+            font-weight: 700;
+            color: var(--pameks-blue);
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            background-color: #fff;
             cursor: pointer;
             outline: none;
-            font-weight: 600;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         select:hover {
-            background-color: #e9ecef;
+            border-color: var(--pameks-blue);
+            box-shadow: 0 4px 10px rgba(15, 43, 76, 0.15);
         }
 
-        /* ŞEMA ALANI */
+        /* --- ŞEMA ALANI --- */
         #chart_div { 
+            flex: 1;
             width: 100%; 
-            height: 100%;
-            overflow: auto; /* Mobilde kaydırma açar */
-            text-align: center;
-            padding-top: 30px;
+            overflow: auto; /* Kaydırma açık */
+            padding-top: 40px;
             padding-bottom: 100px;
-            /* Dokunmatik ekranlarda kaydırmayı yumuşatır */
-            -webkit-overflow-scrolling: touch; 
+            text-align: center;
+            cursor: grab;
+            background-image: radial-gradient(#dfe3eb 1px, transparent 1px);
+            background-size: 20px 20px; /* Arkada teknik çizim hissi veren noktalar */
         }
-
-        /* --- GOOGLE CHARTS ÖZELLEŞTİRME (EN ÖNEMLİ KISIM) --- */
         
-        /* Tablo çizgilerini temizle */
-        table { border-collapse: separate !important; border-spacing: 0 !important; }
+        #chart_div:active { cursor: grabbing; }
 
-        /* Bağlantı çizgileri rengi */
+        /* --- GOOGLE CHARTS OVERRIDE (SİHİRLİ KISIM) --- */
+        
+        table { border-collapse: separate !important; border-spacing: 0 !important; margin: 0 auto; }
+
+        /* Çizgilerin Rengi */
         .google-visualization-orgchart-lineleft, 
         .google-visualization-orgchart-lineright, 
         .google-visualization-orgchart-linebottom { 
-            border-color: #cbd5e1 !important; 
+            border-color: #b0b8c1 !important; 
             border-width: 2px !important;
         }
 
         /* KART TASARIMI */
         .google-visualization-orgchart-node {
-            background: #ffffff; 
-            border: none !important; /* Eski kenarlığı kaldır */
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1); 
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
             padding: 0 !important;
-            width: 180px; 
-            transition: all 0.3s ease;
-            cursor: pointer;
+            width: 200px; /* Geniş kartlar */
         }
 
-        /* Kartın üzerine gelince */
-        .google-visualization-orgchart-node:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-            z-index: 999;
+        /* Kartın İçeriği */
+        .card-box {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 10px 15px rgba(0,0,0,0.03);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            border-top: 4px solid var(--pameks-blue); /* Üst çizgi */
         }
 
-        /* Seçili/Tıklanmış Kart */
-        .google-visualization-orgchart-node-medium {
-            vertical-align: middle;
-            text-align: center;
+        /* Hover Efekti: Kart yukarı kalkar */
+        .google-visualization-orgchart-node:hover .card-box {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(15, 43, 76, 0.15);
+            border-top-color: var(--pameks-red); /* Üst çizgi kırmızı olur */
         }
 
-        /* İÇERİK DÜZENİ */
-        .node-content {
-            padding: 15px 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        /* İçerik Düzeni */
+        .card-content {
+            padding: 15px;
         }
 
-        /* Önce UNVAN (Title) */
+        /* UNVAN (Üstte) */
         .title-text { 
             font-size: 11px; 
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #64748b; /* Gri renk */
-            margin-bottom: 6px;
-            font-weight: 600;
+            letter-spacing: 0.8px;
+            color: #8898aa;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
         }
 
-        /* Sonra İSİM (Name) */
+        /* İSİM (Altta) */
         .name-text { 
-            font-size: 14px; 
-            font-weight: 700; 
-            color: #1e293b; /* Koyu lacivert/siyah */
-            line-height: 1.4;
+            font-size: 15px; 
+            font-weight: 800; 
+            color: var(--pameks-blue);
+            line-height: 1.3;
         }
 
-        /* Yükleniyor yazısı */
+        /* Yükleniyor Yazısı */
         #loading {
-            margin-top: 50px;
-            color: #64748b;
-            font-size: 16px;
+            margin-top: 100px;
+            font-size: 18px;
+            color: var(--pameks-blue);
             font-weight: 500;
+            animation: pulse 1.5s infinite;
         }
 
-        /* MOBİL UYUM (Responsive) */
-        @media (max-width: 768px) {
-            .google-visualization-orgchart-node {
-                width: 140px; /* Mobilde kutular biraz daha dar olsun */
-            }
-            .name-text { font-size: 13px; }
-            .title-text { font-size: 10px; }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
         }
+
+        /* Seçili Kartın Rengi Bozulmasın */
+        .google-visualization-orgchart-node-medium {
+            vertical-align: top;
+        }
+        
     </style>
 </head>
 <body>
 
-    <div class="controls">
+    <div class="header">
         <select id="locationSelect" onchange="filterAndDraw()">
-            <option value="Istanbul">📍 Istanbul HQ</option>
-            <option value="Malkara">🏭 Malkara Production</option>
+            <option value="Istanbul">🏢 ISTANBUL HEADQUARTERS</option>
+            <option value="Malkara">🏭 MALKARA PRODUCTION</option>
         </select>
     </div>
 
     <div id="chart_div">
-        <div id="loading">Loading organization chart...</div>
+        <div id="loading">System Loading...</div>
     </div>
 
     <script type="text/javascript">
         // -----------------------------------------------------------
         // BURAYA CSV LINKINI YAPISTIR
-        const csvLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS53ndrTBAgFEdi_57aoGwMsWukrhbuOaMUpk8haK7cB4Kc_kZVqfCLQ_OQGOWA4W-uc8PU4AMt5i3P/pub?gid=0&single=true&output=csv";
+        const csvLink = "BURAYA_GOOGLE_SHEET_CSV_LINKINI_YAPISTIR";
         // -----------------------------------------------------------
 
         let allData = []; 
@@ -178,7 +191,7 @@
                     filterAndDraw();
                 },
                 error: function(err) {
-                    document.getElementById('loading').innerText = "Error loading data.";
+                    document.getElementById('loading').innerText = "Data Load Error.";
                 }
             });
         }
@@ -203,9 +216,11 @@
                 return [
                     { 
                         v: item.ID, 
-                        f: `<div class="node-content">
-                                <div class="title-text">${item.Title}</div>
-                                <div class="name-text">${item.ID}</div>
+                        f: `<div class="card-box">
+                                <div class="card-content">
+                                    <div class="title-text">${item.Title}</div>
+                                    <div class="name-text">${item.ID}</div>
+                                </div>
                             </div>` 
                     },
                     item.Manager_ID ? item.Manager_ID : '', 
@@ -217,13 +232,12 @@
 
             var chart = new google.visualization.OrgChart(chartDiv);
             
-            // AYARLAR
             chart.draw(data, {
                 'allowHtml': true, 
-                'allowCollapse': true, // İNTERAKTİFLİK: Çift tıklayınca kapanır
+                'allowCollapse': true, 
                 'size': 'medium',
                 'nodeClass': 'google-visualization-orgchart-node',
-                'selectedNodeClass': 'google-visualization-orgchart-node' // Seçilince stil bozulmasın
+                'selectedNodeClass': 'google-visualization-orgchart-node' 
             });
         }
     </script>
