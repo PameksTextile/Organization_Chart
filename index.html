@@ -12,10 +12,10 @@
 
     <style>
         :root {
-            --primary: #0f172a; /* Dark Slate - Tech look */
-            --accent: #3b82f6;  /* Tech Blue */
+            --primary: #0f172a;
+            --accent: #3b82f6;
             --glass: rgba(255, 255, 255, 0.9);
-            --bg-gradient: radial-gradient(circle at center, #f8fafc 0%, #e2e8f0 100%);
+            --bg-gradient: radial-gradient(circle at center, #f8fafc 0%, #cbd5e1 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
@@ -28,188 +28,78 @@
             color: var(--primary);
         }
 
-        /* FULL SCREEN CANVAS */
-        #network-container {
-            width: 100%;
-            height: 100%;
-            cursor: grab;
-        }
-        #network-container:active { cursor: grabbing; }
+        #network-container { width: 100%; height: 100%; }
 
-        /* UI OVERLAY */
         .ui-layer {
-            position: absolute;
-            z-index: 10;
-            pointer-events: none;
-            width: 100%;
-            height: 100%;
-            top: 0; left: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 24px;
+            position: absolute; z-index: 10; pointer-events: none;
+            width: 100%; height: 100%; top: 0; left: 0;
+            display: flex; flex-direction: column; justify-content: space-between; padding: 24px;
         }
 
-        /* HEADER */
         .header-panel {
-            pointer-events: auto;
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            border: 1px solid rgba(255,255,255,0.6);
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
+            pointer-events: auto; background: var(--glass); backdrop-filter: blur(12px);
+            padding: 12px 20px; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.6);
+            display: inline-flex; align-items: center; gap: 12px;
         }
-
         .brand-icon {
-            width: 36px; height: 36px;
-            background: var(--primary);
-            color: white;
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
+            width: 36px; height: 36px; background: var(--primary); color: white;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;
         }
-
-        .brand-info h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.5px; }
+        .brand-info h1 { font-size: 15px; font-weight: 700; }
         .brand-info p { font-size: 11px; color: #64748b; font-weight: 500; }
 
-        /* BOTTOM CONTROLS (FLOATING) */
         .bottom-controls {
-            pointer-events: auto;
-            align-self: center;
-            background: var(--glass);
-            backdrop-filter: blur(16px);
-            padding: 8px 12px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border: 1px solid rgba(255,255,255,0.8);
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 20px;
+            pointer-events: auto; align-self: center; background: var(--glass);
+            backdrop-filter: blur(16px); padding: 8px 12px; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8);
+            display: flex; gap: 12px; align-items: center; margin-bottom: 20px;
         }
 
-        .control-item {
-            display: flex;
-            align-items: center;
-            position: relative;
+        select, .search-input {
+            padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0;
+            background: white; font-size: 13px; color: #334155; font-weight: 500;
         }
-
-        select {
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            font-size: 13px;
-            color: #334155;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        select:hover { border-color: var(--accent); }
-
-        .search-input {
-            padding: 10px 14px 10px 34px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            font-size: 13px;
-            width: 220px;
-            transition: all 0.3s;
-        }
-        .search-input:focus { width: 260px; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .search-icon { position: absolute; left: 12px; font-size: 13px; color: #94a3b8; }
-
-        .btn-icon {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            color: #475569;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-        }
-        .btn-icon:hover { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* SIDEBAR (DETAILS) */
+        .search-input { width: 220px; padding-left: 34px; }
+        .search-wrapper { position: relative; }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; }
+        
         .sidebar {
-            pointer-events: auto;
-            position: absolute;
-            right: -350px;
-            top: 24px; bottom: 24px;
-            width: 320px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: -10px 0 40px rgba(0,0,0,0.05);
-            padding: 32px;
-            transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 20;
+            pointer-events: auto; position: absolute; right: -350px; top: 24px; bottom: 24px;
+            width: 320px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px);
+            border-radius: 24px; box-shadow: -10px 0 40px rgba(0,0,0,0.05);
+            padding: 32px; transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 20;
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
-
         .sidebar.open { right: 24px; }
-        .sidebar-close { position: absolute; top: 20px; right: 20px; cursor: pointer; color: #cbd5e1; transition: 0.2s; }
-        .sidebar-close:hover { color: var(--primary); }
-
-        .profile-avatar {
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; font-weight: 600;
-            margin-bottom: 16px;
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-        }
-
-        .profile-name { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-        .profile-title { font-size: 13px; color: #64748b; font-weight: 500; margin-bottom: 24px; }
+        .sidebar-close { position: absolute; top: 20px; right: 20px; cursor: pointer; color: #cbd5e1; }
         
-        .info-row {
-            width: 100%;
-            display: flex; justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f5f9;
+        .profile-avatar {
+            width: 80px; height: 80px; border-radius: 50%; background: var(--accent); color: white;
+            display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 600;
+            margin-bottom: 16px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
-        .info-label { font-size: 12px; color: #94a3b8; font-weight: 500; }
-        .info-val { font-size: 13px; color: #334155; font-weight: 600; text-align: right;}
+        .profile-name { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .profile-title { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+        .info-row { width: 100%; display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+        .info-label { font-size: 12px; color: #94a3b8; } .info-val { font-size: 13px; color: #334155; font-weight: 600; }
 
         /* Loader */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 999;
-            display: flex; align-items: center; justify-content: center; flex-direction: column;
-        }
-        .spinner {
-            width: 40px; height: 40px; border: 3px solid #f1f5f9;
-            border-top-color: var(--primary); border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 999; display: flex; align-items: center; justify-content: center; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #f1f5f9; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <div style="margin-top:15px; font-size:14px; color:#64748b; font-weight:500;">Loading Structure...</div>
-    </div>
+    <div id="loader"><div class="spinner"></div></div>
 
     <div id="network-container"></div>
 
     <div class="ui-layer">
         <div class="header-panel">
             <div class="brand-icon"><i class="fas fa-sitemap"></i></div>
-            <div class="brand-info">
-                <h1>PAMEKS</h1>
-                <p>Digital Organization Chart</p>
-            </div>
+            <div class="brand-info"><h1>PAMEKS</h1><p>Digital Organization Chart</p></div>
         </div>
 
         <div class="sidebar" id="sidebar">
@@ -217,35 +107,20 @@
             <div class="profile-avatar" id="sb-avatar"></div>
             <div class="profile-name" id="sb-name">-</div>
             <div class="profile-title" id="sb-title">-</div>
-            
-            <div class="info-row">
-                <span class="info-label">Location</span>
-                <span class="info-val" id="sb-loc">-</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Reports To</span>
-                <span class="info-val" id="sb-manager">-</span>
-            </div>
-            <div class="info-row" style="border:none; margin-top:10px;">
-                <span class="info-label">Status</span>
-                <span class="info-val" style="color:var(--accent)">Active</span>
-            </div>
+            <div class="info-row"><span class="info-label">Location</span><span class="info-val" id="sb-loc">-</span></div>
+            <div class="info-row"><span class="info-label">Reports To</span><span class="info-val" id="sb-manager">-</span></div>
         </div>
 
         <div class="bottom-controls">
-            <div class="control-item">
-                <select id="locationSelect" onchange="drawGraph()">
-                    <option value="Istanbul">Istanbul HQ</option>
-                    <option value="Malkara">Malkara Plant</option>
-                </select>
-            </div>
-            <div class="control-item">
+            <select id="locationSelect" onchange="drawGraph()">
+                <option value="Istanbul">Istanbul HQ</option>
+                <option value="Malkara">Malkara Plant</option>
+            </select>
+            <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" class="search-input" id="searchBox" placeholder="Search employee..." onkeyup="handleSearch()">
             </div>
-            <button class="btn-icon" onclick="network.fit({animation:true})" title="Reset View">
-                <i class="fas fa-compress-arrows-alt"></i>
-            </button>
+            <button onclick="network.fit({animation:true})" style="border:none; background:none; cursor:pointer; color:#475569;"><i class="fas fa-compress-arrows-alt fa-lg"></i></button>
         </div>
     </div>
 
@@ -254,154 +129,112 @@
         
         let network = null;
         let allData = [];
-        let nodes = [];
-        let edges = [];
 
-        // 1. Fetch Data
         Papa.parse(CSV_URL, {
-            download: true,
-            header: true,
+            download: true, header: true,
             complete: function(results) {
                 allData = results.data.filter(d => d.ID && d.ID.trim() !== "");
                 drawGraph();
                 document.getElementById('loader').style.display = 'none';
-            },
-            error: (err) => console.error("CSV Error", err)
+            }
         });
 
-        // 2. Main Drawing Function
         function drawGraph() {
             const container = document.getElementById('network-container');
             const selectedLoc = document.getElementById('locationSelect').value;
             const searchTerm = document.getElementById('searchBox').value.toLowerCase();
 
-            // Filter Data
-            let filteredData = allData.filter(item => 
-                item.Lokasyon && item.Lokasyon.trim() === selectedLoc
-            );
+            let filteredData = allData.filter(item => item.Lokasyon && item.Lokasyon.trim() === selectedLoc);
 
-            // Search Logic
             if (searchTerm.length > 1) {
                 filteredData = filteredData.filter(item => 
-                    item.ID.toLowerCase().includes(searchTerm) || 
-                    item.Title.toLowerCase().includes(searchTerm)
+                    item.ID.toLowerCase().includes(searchTerm) || item.Title.toLowerCase().includes(searchTerm)
                 );
             }
 
-            // HIERARCHY LOGIC: Calculate levels for sizing
-            // Level 0 = Top Manager (No manager in current list)
-            // Level 1 = Direct Reports
-            // Level 2 = Others
-            const levelMap = new Map();
+            // --- İŞTE BURADA DÜZELTME YAPIYORUZ ---
+            // Yöneticileri tespit etmek için artık sadece manager_id'ye bakmıyoruz.
+            // Ünvanında "Board", "Yönetim", "Chairman" geçenleri ZORLA en tepeye alıyoruz.
             
-            // Find root(s)
-            filteredData.forEach(p => {
-                const hasManager = filteredData.find(m => m.ID === p.Manager_ID);
-                if (!hasManager) levelMap.set(p.ID, 0); // Root
-            });
+            const nodes = filteredData.map(person => {
+                let level = 2; // Varsayılan çalışan
 
-            // Calculate recursive levels
-            function calcLevels(managerId, currentLevel) {
-                const reports = filteredData.filter(p => p.Manager_ID === managerId);
-                reports.forEach(r => {
-                    levelMap.set(r.ID, currentLevel + 1);
-                    calcLevels(r.ID, currentLevel + 1);
-                });
-            }
-
-            // Start calculation from roots
-            levelMap.forEach((lvl, id) => {
-                if (lvl === 0) calcLevels(id, 0);
-            });
-
-            // Create Nodes & Edges
-            nodes = filteredData.map(person => {
-                const level = levelMap.get(person.ID) || 2; // Default to lowest if unclear
+                const titleUpper = person.Title ? person.Title.toUpperCase() : "";
                 
-                // VISUAL HIERARCHY SETTINGS
-                let size = 20; 
-                let color = "#cbd5e1"; // Default Gray
-                let font = { size: 14, color: "#475569", face: "Inter", vadjust: 0 };
+                // 1. KURAL: BOARD OF MANAGEMENT HER ZAMAN EN BÜYÜK (LEVEL 0)
+                if (titleUpper.includes("BOARD") || titleUpper.includes("YÖNETİM") || titleUpper.includes("CHAIRMAN")) {
+                    level = 0; // The Big Boss
+                }
+                // 2. KURAL: Eğer bir başkası bu kişiye manager olarak atanmışsa, bu kişi Yöneticidir (LEVEL 1)
+                else {
+                    const isManager = allData.some(p => p.Manager_ID === person.ID);
+                    if (isManager) level = 1;
+                }
+
+                // GÖRSEL AYARLAR
+                let size, color, fontSize, fontColor;
 
                 if (level === 0) {
-                    size = 50; // BIGGEST (Center)
-                    color = "#0f172a"; // Darkest
-                    font = { size: 22, color: "#0f172a", face: "Inter", weight: "bold" };
+                    size = 65; // MERKEZ KOCAMAN
+                    color = "#0f172a"; // En koyu (Siyah/Lacivert)
+                    fontSize = 24;
+                    fontColor = "#0f172a";
                 } else if (level === 1) {
-                    size = 35; // MEDIUM (Direct Report)
-                    color = "#3b82f6"; // Blue
-                    font = { size: 16, color: "#1e293b", face: "Inter" };
+                    size = 35; // MÜDÜRLER ORTA
+                    color = "#3b82f6"; // Mavi
+                    fontSize = 16;
+                    fontColor = "#1e293b";
                 } else {
-                    size = 15; // SMALLEST
-                    color = "#94a3b8";
-                    font = { size: 12, color: "#64748b", face: "Inter" };
+                    size = 15; // ÇALIŞANLAR KÜÇÜK
+                    color = "#cbd5e1"; // Gri
+                    fontSize = 12;
+                    fontColor = "#64748b";
                 }
 
                 return {
                     id: person.ID,
-                    label: `<b>${person.ID}</b>\n${person.Title}`, // Name on top, Title below
+                    label: `<b>${person.ID}</b>\n${person.Title}`,
                     title: person.Title,
-                    shape: 'dot', // No initials, just clean dot
+                    shape: 'dot',
                     size: size,
-                    color: {
-                        background: color,
-                        border: "white",
-                        highlight: { background: "#f59e0b", border: "white" }
-                    },
-                    borderWidth: 4,
-                    font: { multi: 'html', ...font },
-                    shadow: { enabled: true, color: 'rgba(0,0,0,0.1)', size: 10, x: 0, y: 5 }
+                    color: { background: color, border: "white", highlight: { background: "#f59e0b", border: "white" } },
+                    borderWidth: level === 0 ? 6 : 3, // Patronun çerçevesi daha kalın
+                    font: { multi: 'html', size: fontSize, color: fontColor, face: "Inter", vadjust: 0 },
+                    shadow: { enabled: true, color: 'rgba(0,0,0,0.15)', size: 10, x: 0, y: 5 }
                 };
             });
 
-            edges = filteredData
+            const edges = filteredData
                 .filter(p => p.Manager_ID && filteredData.find(m => m.ID === p.Manager_ID))
                 .map(p => ({
                     from: p.Manager_ID,
                     to: p.ID,
-                    color: { color: "#e2e8f0", opacity: 0.8 },
-                    width: 2
+                    color: { color: "#cbd5e1", opacity: 0.6 },
+                    width: 1
                 }));
 
             const data = { nodes: nodes, edges: edges };
 
             const options = {
-                layout: {
-                    improvedLayout: true
-                },
+                layout: { improvedLayout: true },
                 physics: {
                     enabled: true,
-                    // BARNES HUT: Good for hierarchical starbursts
                     barnesHut: {
-                        gravitationalConstant: -4000, // Strong repulsion to spread out
-                        centralGravity: 0.3, // Pulls center to middle
-                        springLength: 150, // Length of lines
+                        gravitationalConstant: -5000, // Güçlü itme (birbirlerinden ayrılsınlar)
+                        centralGravity: 0.5,          // Merkeze çekim
+                        springLength: 200,            // Bağlantı uzunluğu
                         springConstant: 0.04,
                         damping: 0.09,
-                        avoidOverlap: 1 // Crucial for preventing overlap
-                    },
-                    stabilization: {
-                        enabled: true,
-                        iterations: 1000 // Pre-calculate to avoid messy start
+                        avoidOverlap: 1
                     }
                 },
-                nodes: {
-                    shapeProperties: {
-                        interpolation: false // Crisp borders
-                    }
-                },
-                interaction: {
-                    hover: true,
-                    tooltipDelay: 200,
-                    zoomView: true
-                }
+                nodes: { shapeProperties: { interpolation: false } },
+                interaction: { hover: true, tooltipDelay: 200, zoomView: true }
             };
 
-            // Initialize Network
             if (network) network.destroy();
             network = new vis.Network(container, data, options);
 
-            // Click Event for Sidebar
             network.on("click", function(params) {
                 if (params.nodes.length > 0) {
                     const person = allData.find(p => p.ID === params.nodes[0]);
@@ -412,30 +245,23 @@
             });
         }
 
-        // Search Handling
         function handleSearch() {
             clearTimeout(window.searchTimeout);
             window.searchTimeout = setTimeout(drawGraph, 600);
         }
 
-        // Sidebar Functions
         function openSidebar(person) {
             const sb = document.getElementById('sidebar');
             const initials = person.ID.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-            
             document.getElementById('sb-avatar').innerText = initials;
             document.getElementById('sb-name').innerText = person.ID;
             document.getElementById('sb-title').innerText = person.Title;
             document.getElementById('sb-loc').innerText = person.Lokasyon;
-            document.getElementById('sb-manager').innerText = person.Manager_ID || "Board / CEO";
-            
+            document.getElementById('sb-manager').innerText = person.Manager_ID || "Board";
             sb.classList.add('open');
         }
 
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.remove('open');
-        }
-
+        function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
     </script>
 </body>
 </html>
