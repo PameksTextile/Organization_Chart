@@ -1,245 +1,237 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pameks Organization Chart</title>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Pameks Tekstil - Premium Dark Chart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Dark Premium Background */
+    body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #0f172a; overflow: hidden; }
+    #chart-container { width: 100vw; height: calc(100vh - 80px); }
     
-    <style>
-        :root {
-            /* PAMEKS KURUMSAL RENKLERİ */
-            --pameks-blue: #0f2b4c; /* Koyu Lacivert */
-            --pameks-red: #e30613;  /* Logodaki Kırmızı */
-            --bg-color: #eef2f6;    /* Açık Gri Zemin */
-        }
+    .top-panel {
+      height: 80px; background: #1e293b; display: flex; align-items: center; 
+      justify-content: space-between; padding: 0 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: relative; z-index: 100;
+    }
+    
+    .location-btns { display: flex; gap: 10px; }
+    /* Dark Search Group */
+    .search-group { display: flex; gap: 5px; align-items: center; background: #334155; padding: 5px; border-radius: 30px; border: 1.5px solid #E31E24; }
+    .search-select { padding: 8px 10px; border: none; background: transparent; font-weight: 600; color: #f8fafc; cursor: pointer; outline: none; }
+    .search-input { padding: 10px 20px; border: none; border-radius: 20px; width: 250px; outline: none; font-size: 14px; background: #1e293b; color: white; }
 
-        body { 
-            font-family: 'Roboto', sans-serif; 
-            background-color: var(--bg-color);
-            margin: 0; 
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Sayfa kaymasın, sadece şema kaysın */
-        }
+    .btn { padding: 10px 20px; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; background: #334155; color: #94a3b8; }
+    .btn.active { background: #E31E24; color: white; }
 
-        /* --- ÜST KONTROL PANELI --- */
-        .header {
-            background: #fff;
-            padding: 15px 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-bottom: 3px solid var(--pameks-red);
-        }
+    /* --- DARK MODAL STYLES --- */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 3000;
+    }
+    .modal-content {
+      background: #1e293b; width: 90%; max-width: 400px; padding: 40px;
+      border-radius: 20px; border: 1px solid #334155; color: white;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      position: relative; animation: modalSlideUp 0.3s ease;
+    }
+    @keyframes modalSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    
+    .close-modal { position: absolute; top: 20px; right: 20px; border: none; background: none; font-size: 28px; cursor: pointer; color: #94a3b8; }
+    .modal-header { border-bottom: 2px solid #334155; padding-bottom: 20px; margin-bottom: 20px; text-align: center; }
+    .modal-name { font-size: 20px; font-weight: 700; color: white; margin: 0; }
+    .modal-title { font-size: 13px; color: #E31E24; font-weight: 700; text-transform: uppercase; margin-top: 10px; letter-spacing: 0.5px; }
+    .modal-item { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
+    .modal-label { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+    .modal-value { font-size: 15px; font-weight: 600; color: #f1f5f9; word-break: break-word; }
 
-        select {
-            padding: 12px 30px;
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--pameks-blue);
-            border: 2px solid #e0e0e0;
-            border-radius: 50px;
-            background-color: #fff;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
+    /* Highlight Adjustment */
+    .node-highlight-rect, .node-highlight-circle, .node-highlight-path, svg rect[fill="none"][stroke-width] { display: none !important; opacity: 0 !important; }
+    .highlighted-node { box-shadow: inset 0 0 0 6px #ffd700, 0 0 30px rgba(255, 215, 0, 0.3) !important; }
 
-        select:hover {
-            border-color: var(--pameks-blue);
-            box-shadow: 0 4px 10px rgba(15, 43, 76, 0.15);
-        }
+    .controls { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+    .control-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: #1e293b; color: white; font-size: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; border: 1px solid #334155; }
 
-        /* --- ŞEMA ALANI --- */
-        #chart_div { 
-            flex: 1;
-            width: 100%; 
-            overflow: auto; /* Kaydırma açık */
-            padding-top: 40px;
-            padding-bottom: 100px;
-            text-align: center;
-            cursor: grab;
-            background-image: radial-gradient(#dfe3eb 1px, transparent 1px);
-            background-size: 20px 20px; /* Arkada teknik çizim hissi veren noktalar */
-        }
-        
-        #chart_div:active { cursor: grabbing; }
-
-        /* --- GOOGLE CHARTS OVERRIDE (SİHİRLİ KISIM) --- */
-        
-        table { border-collapse: separate !important; border-spacing: 0 !important; margin: 0 auto; }
-
-        /* Çizgilerin Rengi */
-        .google-visualization-orgchart-lineleft, 
-        .google-visualization-orgchart-lineright, 
-        .google-visualization-orgchart-linebottom { 
-            border-color: #b0b8c1 !important; 
-            border-width: 2px !important;
-        }
-
-        /* KART TASARIMI */
-        .google-visualization-orgchart-node {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            width: 200px; /* Geniş kartlar */
-        }
-
-        /* Kartın İçeriği */
-        .card-box {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 10px 15px rgba(0,0,0,0.03);
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            border-top: 4px solid var(--pameks-blue); /* Üst çizgi */
-        }
-
-        /* Hover Efekti: Kart yukarı kalkar */
-        .google-visualization-orgchart-node:hover .card-box {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(15, 43, 76, 0.15);
-            border-top-color: var(--pameks-red); /* Üst çizgi kırmızı olur */
-        }
-
-        /* İçerik Düzeni */
-        .card-content {
-            padding: 15px;
-        }
-
-        /* UNVAN (Üstte) */
-        .title-text { 
-            font-size: 11px; 
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #8898aa;
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        /* İSİM (Altta) */
-        .name-text { 
-            font-size: 15px; 
-            font-weight: 800; 
-            color: var(--pameks-blue);
-            line-height: 1.3;
-        }
-
-        /* Yükleniyor Yazısı */
-        #loading {
-            margin-top: 100px;
-            font-size: 18px;
-            color: var(--pameks-blue);
-            font-weight: 500;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        /* Seçili Kartın Rengi Bozulmasın */
-        .google-visualization-orgchart-node-medium {
-            vertical-align: top;
-        }
-        
-    </style>
+    #loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: white; font-weight: 600; }
+    /* Lighter Links for Dark Background */
+    .link { stroke: #475569 !important; stroke-width: 2px !important; }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <select id="locationSelect" onchange="filterAndDraw()">
-            <option value="Istanbul">🏢 ISTANBUL HEADQUARTERS</option>
-            <option value="Malkara">🏭 MALKARA PRODUCTION</option>
-        </select>
+  <div class="top-panel">
+    <div class="location-btns">
+      <button id="btn-Istanbul" class="btn active" onclick="changeLocation('Istanbul')">ISTANBUL</button>
+      <button id="btn-Malkara" class="btn" onclick="changeLocation('Malkara')">MALKARA</button>
     </div>
-
-    <div id="chart_div">
-        <div id="loading">System Loading...</div>
+    <div class="search-group">
+      <select id="searchType" class="search-select">
+        <option value="id">Search Person</option>
+        <option value="title">Search Title</option>
+      </select>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search..." list="searchList">
+      <datalist id="searchList"></datalist>
     </div>
+  </div>
 
-    <script type="text/javascript">
-        // -----------------------------------------------------------
-        // BURAYA CSV LINKINI YAPISTIR
-        const csvLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS53ndrTBAgFEdi_57aoGwMsWukrhbuOaMUpk8haK7cB4Kc_kZVqfCLQ_OQGOWA4W-uc8PU4AMt5i3P/pub?gid=0&single=true&output=csv";
-        // -----------------------------------------------------------
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="close-modal" onclick="closeModal()">×</button>
+      <div class="modal-header">
+        <p id="mName" class="modal-name"></p>
+        <p id="mTitle" class="modal-title"></p>
+      </div>
+      <div class="modal-item">
+        <span class="modal-label">Reports To</span>
+        <span id="mManager" class="modal-value"></span>
+      </div>
+      <div id="m-email-box" class="modal-item">
+        <span class="modal-label">Email</span>
+        <span id="mEmail" class="modal-value"></span>
+      </div>
+      <div id="m-phone-box" class="modal-item">
+        <span class="modal-label">Phone</span>
+        <span id="mPhone" class="modal-value"></span>
+      </div>
+    </div>
+  </div>
 
-        let allData = []; 
+  <div class="controls">
+    <button class="control-btn" onclick="chart.zoomIn()" title="Zoom In">+</button>
+    <button class="control-btn" onclick="chart.zoomOut()" title="Zoom Out">-</button>
+    <button class="control-btn" onclick="chart.fit()" title="Fit to Screen">⟲</button>
+    <button class="control-btn" onclick="toggleFullScreen()" title="Full Screen">⛶</button>
+  </div>
 
-        google.charts.load('current', {packages:["orgchart"]});
-        google.charts.setOnLoadCallback(fetchData);
+  <div id="loading">Initializing System...</div>
+  <div id="chart-container"></div>
 
-        function fetchData() {
-            Papa.parse(csvLink, {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    allData = results.data;
-                    filterAndDraw();
-                },
-                error: function(err) {
-                    document.getElementById('loading').innerText = "Data Load Error.";
-                }
-            });
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@3.1.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.1.2/build/d3-flextree.js"></script>
+
+  <script>
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS53ndrTBAgFEdi_57aoGwMsWukrhbuOaMUpk8haK7cB4Kc_kZVqfCLQ_OQGOWA4W-uc8PU4AMt5i3P/pub?gid=0&single=true&output=csv";
+    let allData = [];
+    let currentFilteredData = [];
+    let chart;
+
+    d3.csv(CSV_URL).then(data => {
+      document.getElementById('loading').style.display = 'none';
+      allData = data.map(d => ({
+        id: d.ID ? d.ID.trim() : "",
+        parentId: d.Manager_ID ? d.Manager_ID.trim() : "",
+        title: d.Title ? d.Title.trim() : "",
+        location: d.Lokasyon ? d.Lokasyon.trim() : "",
+        email: d.Email ? d.Email.trim() : "",
+        phone: d.Phone ? d.Phone.trim() : ""
+      })).filter(d => d.id !== "");
+      changeLocation('Istanbul');
+    });
+
+    function changeLocation(loc) {
+      document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-' + loc).classList.add('active');
+      document.getElementById('searchInput').value = "";
+      closeModal();
+      const filtered = allData.filter(d => d.location === loc);
+      const idsInLocation = new Set(filtered.map(d => d.id));
+      const managers = new Set(filtered.map(d => d.parentId).filter(p => p && idsInLocation.has(p)));
+      currentFilteredData = filtered.map(d => ({
+        ...d,
+        parentId: idsInLocation.has(d.parentId) ? d.parentId : null,
+        isManager: managers.has(d.id)
+      }));
+      updateSearchList();
+      renderChart(currentFilteredData);
+    }
+
+    function updateSearchList() {
+      const type = document.getElementById('searchType').value;
+      const list = document.getElementById('searchList');
+      list.innerHTML = "";
+      const values = [...new Set(currentFilteredData.map(d => type === 'id' ? d.id : d.title))];
+      values.forEach(v => {
+        const opt = document.createElement('option'); opt.value = v; list.appendChild(opt);
+      });
+    }
+
+    document.getElementById('searchType').addEventListener('change', updateSearchList);
+
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const val = e.target.value.trim();
+      const type = document.getElementById('searchType').value;
+      if (val === "") { renderChart(currentFilteredData); return; }
+      const targetNode = currentFilteredData.find(d => (type === 'id' ? d.id : d.title) === val);
+      if (targetNode) {
+        const focusIds = new Set();
+        let current = targetNode;
+        while (current) {
+          focusIds.add(current.id);
+          current = currentFilteredData.find(d => d.id === current.parentId);
         }
+        const focusData = currentFilteredData.filter(d => focusIds.has(d.id));
+        renderChart(focusData.map(d => ({ ...d, _highlighted: d.id === targetNode.id })));
+      }
+    });
 
-        function filterAndDraw() {
-            const selectedLocation = document.getElementById('locationSelect').value;
-            const chartDiv = document.getElementById('chart_div');
-            
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Name');
-            data.addColumn('string', 'Manager');
-            data.addColumn('string', 'ToolTip');
+    window.showModalById = function(nodeId) {
+      const d = currentFilteredData.find(p => p.id === nodeId);
+      if (!d) return;
+      document.getElementById('mName').innerText = d.id;
+      document.getElementById('mTitle').innerText = d.title;
+      const manager = currentFilteredData.find(p => p.id === d.parentId);
+      document.getElementById('mManager').innerText = manager ? manager.id : "Top Management";
+      document.getElementById('mEmail').innerText = d.email;
+      document.getElementById('m-email-box').style.display = d.email ? 'flex' : 'none';
+      document.getElementById('mPhone').innerText = d.phone;
+      document.getElementById('m-phone-box').style.display = d.phone ? 'flex' : 'none';
+      document.getElementById('modalOverlay').style.display = 'flex';
+    };
 
-            var filteredData = allData.filter(item => item.Lokasyon && item.Lokasyon.trim() === selectedLocation);
+    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
 
-            if (filteredData.length === 0) {
-                chartDiv.innerHTML = "<div id='loading'>No data found.</div>";
-                return;
-            }
+    function renderChart(data) {
+      document.getElementById('chart-container').innerHTML = '';
+      chart = new d3.OrgChart()
+        .container('#chart-container')
+        .data(data)
+        .nodeHeight(d => 105)
+        .nodeWidth(d => 230)
+        .childrenMargin(d => 85)
+        .compactMarginBetween(d => 65)
+        .nodeContent(function(d) {
+          let bgColor, textColor, titleColor, borderRadius;
+          // Hierarchy styling adjusted for Dark Mode
+          if (d.depth === 0) { 
+            bgColor = '#E31E24'; textColor = '#ffffff'; titleColor = '#ffcccc'; borderRadius = '60px'; // CEO
+          } else if (d.data.isManager && d.depth === 1) { 
+            bgColor = '#002147'; textColor = '#ffffff'; titleColor = '#cbd5e0'; borderRadius = '4px';  // Executives
+          } else if (d.data.isManager) { 
+            bgColor = '#2C3E50'; textColor = '#ffffff'; titleColor = '#94a3b8'; borderRadius = '15px'; // Managers
+          } else { 
+            bgColor = '#475569'; textColor = '#f8fafc'; titleColor = '#cbd5e0'; borderRadius = '35px'; // Staff
+          }
 
-            var chartRows = filteredData.map(item => {
-                return [
-                    { 
-                        v: item.ID, 
-                        f: `<div class="card-box">
-                                <div class="card-content">
-                                    <div class="title-text">${item.Title}</div>
-                                    <div class="name-text">${item.ID}</div>
-                                </div>
-                            </div>` 
-                    },
-                    item.Manager_ID ? item.Manager_ID : '', 
-                    item.Title
-                ];
-            });
+          const highlightClass = d.data._highlighted ? 'highlighted-node' : '';
+          const displayName = d.data.id.split(' & ').join('<br/>');
 
-            data.addRows(chartRows);
+          return `
+            <div class="${highlightClass}" ondblclick="window.showModalById('${d.data.id}')" style="background:${bgColor}; height:100%; padding:12px; border-radius:${borderRadius}; text-align:center; display:flex; flex-direction:column; justify-content:center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor:pointer; border:1px solid rgba(255,255,255,0.1);">
+              <div style="font-size:12px; font-weight:700; color:${titleColor}; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; line-height:1.1; pointer-events: none;">${d.data.title}</div>
+              <div style="font-size:15px; font-weight:600; color:${textColor}; line-height:1.2; pointer-events: none;">${displayName}</div>
+            </div>`;
+        })
+        .render()
+        .expandAll()
+        .fit();
+    }
 
-            var chart = new google.visualization.OrgChart(chartDiv);
-            
-            chart.draw(data, {
-                'allowHtml': true, 
-                'allowCollapse': true, 
-                'size': 'medium',
-                'nodeClass': 'google-visualization-orgchart-node',
-                'selectedNodeClass': 'google-visualization-orgchart-node' 
-            });
-        }
-    </script>
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  </script>
 </body>
 </html>
