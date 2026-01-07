@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Kurumsal Organizasyon Şeması</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        
+        /* Butonların Stili */
+        .btn-container { text-align: center; margin-bottom: 30px; }
+        .btn {
+            background-color: #fff; border: 2px solid #007bff; color: #007bff;
+            padding: 10px 25px; cursor: pointer; font-size: 16px; margin: 0 10px;
+            border-radius: 30px; transition: all 0.3s; font-weight: bold;
+        }
+        .btn:hover, .btn.active { background-color: #007bff; color: white; }
+
+        /* Şema Alanı */
+        #chart_div { width: 100%; min-height: 500px; overflow: auto; text-align: center; }
+        
+        /* Kutu Tasarımı */
+        .google-visualization-orgchart-node {
+            background: #ffffff; border: 0; border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 15px;
+            border-left: 5px solid #007bff; /* Sol taraf mavi çizgi */
+        }
+        .isim { font-size: 16px; font-weight: bold; color: #333; }
+        .unvan { font-size: 13px; color: #777; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="btn-container">
+        <button class="btn active" onclick="filtreleVeCiz('Istanbul')">İSTANBUL MERKEZ</button>
+        <button class="btn" onclick="filtreleVeCiz('Malkara')">MALKARA ÜRETİM</button>
+    </div>
+
+    <div id="chart_div">Veriler yükleniyor...</div>
+
+    <script type="text/javascript">
+        // -----------------------------------------------------------
+        // BURAYA CSV LINKINI YAPISTIR
+        const csvLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS53ndrTBAgFEdi_57aoGwMsWukrhbuOaMUpk8haK7cB4Kc_kZVqfCLQ_OQGOWA4W-uc8PU4AMt5i3P/pub?output=csv";
+        // -----------------------------------------------------------
+
+        let tumVeri = []; // Veriyi hafızada tutacağız
+
+        google.charts.load('current', {packages:["orgchart"]});
+        google.charts.setOnLoadCallback(veriCek);
+
+        // 1. Veriyi Sadece Bir Kere Çekiyoruz
+        function veriCek() {
+            Papa.parse(csvLink, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    tumVeri = results.data;
+                    filtreleVeCiz('Istanbul'); // Sayfa açılınca varsayılan İstanbul gelsin
+                }
+            });
+        }
+
+        // 2. Lokasyona Göre Filtreleyip Çiziyoruz
+        function filtreleVeCiz(lokasyon) {
+            // Buton renklerini ayarla
+            document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active'); // Tıklanan butonu aktif yap (Hata verirse dert etme çalışır)
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Name');
+            data.addColumn('string', 'Manager');
+            data.addColumn('string', 'ToolTip');
+
+            // Sadece seçilen lokasyondaki kişileri filtrele
+            var filtrelenmisVeri = tumVeri.filter(item => item.Lokasyon && item.Lokasyon.trim() === lokasyon);
+
+            var chartRows = filtrelenmisVeri.map(item => {
+                return [
+                    { v: item.ID, f: `<div class="isim">${item.ID}</div><div class="unvan">${item.Title}</div>` },
+                    item.Manager_ID ? item.Manager_ID : '', 
+                    item.Title
+                ];
+            });
+
+            data.addRows(chartRows);
+            var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
+            chart.draw(data, {'allowHtml':true, 'size': 'medium'});
+        }
+    </script>
+</body>
+</html>
