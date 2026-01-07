@@ -1,575 +1,435 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pameks Dijital Organizasyon</title>
+    <title>Pameks Digital Organization</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --primary: #2563eb; /* Modern Mavi */
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --glass: rgba(255, 255, 255, 0.85);
-            --border: rgba(0, 0, 0, 0.08);
+            --primary: #0f172a; /* Dark Slate - Tech look */
+            --accent: #3b82f6;  /* Tech Blue */
+            --glass: rgba(255, 255, 255, 0.9);
+            --bg-gradient: radial-gradient(circle at center, #f8fafc 0%, #e2e8f0 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #f1f5f9; /* Çok açık gri, göz yormaz */
+            background: var(--bg-gradient);
             height: 100vh;
             overflow: hidden;
-            color: var(--dark);
+            color: var(--primary);
         }
 
-        /* TAM EKRAN CANVAS */
+        /* FULL SCREEN CANVAS */
         #network-container {
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+            cursor: grab;
         }
+        #network-container:active { cursor: grabbing; }
 
-        /* MODERN UI KATMANLARI */
+        /* UI OVERLAY */
         .ui-layer {
             position: absolute;
             z-index: 10;
-            pointer-events: none; /* Tıklamalar arkaya geçsin */
+            pointer-events: none;
             width: 100%;
             height: 100%;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px;
+            padding: 24px;
         }
 
-        /* HEADER - SOL ÜST */
+        /* HEADER */
         .header-panel {
             pointer-events: auto;
             background: var(--glass);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 16px 24px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            border: 1px solid rgba(255,255,255,0.5);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.6);
             display: inline-flex;
             align-items: center;
-            gap: 15px;
-            max-width: 400px;
+            gap: 12px;
         }
 
         .brand-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px; height: 36px;
             background: var(--primary);
             color: white;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
         }
 
-        .brand-info h1 { font-size: 16px; font-weight: 700; color: #1e293b; }
-        .brand-info p { font-size: 12px; color: #64748b; }
+        .brand-info h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.5px; }
+        .brand-info p { font-size: 11px; color: #64748b; font-weight: 500; }
 
-        /* ALT KONTROL PANELİ (Resimdeki gibi) */
+        /* BOTTOM CONTROLS (FLOATING) */
         .bottom-controls {
             pointer-events: auto;
             align-self: center;
             background: var(--glass);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 10px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            border: 1px solid rgba(255,255,255,0.6);
+            padding: 8px 12px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.8);
             display: flex;
-            gap: 8px;
+            gap: 12px;
+            align-items: center;
             margin-bottom: 20px;
-            transition: transform 0.3s ease;
         }
 
-        .control-group {
+        .control-item {
             display: flex;
             align-items: center;
-            background: rgba(255,255,255,0.5);
-            border-radius: 14px;
-            padding: 4px;
-            border: 1px solid rgba(0,0,0,0.04);
-        }
-
-        .btn-mode {
-            padding: 10px 20px;
-            border-radius: 12px;
-            border: none;
-            background: transparent;
-            color: #64748b;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-mode.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .btn-mode:hover:not(.active) {
-            color: #334155;
-            background: rgba(255,255,255,0.8);
-        }
-
-        .search-wrapper {
             position: relative;
-            margin-left: 10px;
-        }
-
-        .search-input {
-            padding: 10px 16px 10px 36px;
-            border-radius: 12px;
-            border: 1px solid transparent;
-            background: white;
-            font-size: 13px;
-            width: 200px;
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            width: 240px;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-            font-size: 14px;
         }
 
         select {
-            padding: 10px 16px;
-            border-radius: 12px;
-            border: 1px solid transparent;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
             background: white;
             font-size: 13px;
+            color: #334155;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        select:hover { border-color: var(--accent); }
+
+        .search-input {
+            padding: 10px 14px 10px 34px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 13px;
+            width: 220px;
+            transition: all 0.3s;
+        }
+        .search-input:focus { width: 260px; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .search-icon { position: absolute; left: 12px; font-size: 13px; color: #94a3b8; }
+
+        .btn-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: white;
             color: #475569;
             cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
         }
+        .btn-icon:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* SIDEBAR (Detay Paneli) */
+        /* SIDEBAR (DETAILS) */
         .sidebar {
             pointer-events: auto;
             position: absolute;
-            right: -320px;
-            top: 20px;
-            bottom: 20px;
-            width: 300px;
+            right: -350px;
+            top: 24px; bottom: 24px;
+            width: 320px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-radius: 20px 0 0 20px;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.05);
-            padding: 30px;
-            transition: right 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            border-radius: 24px;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.05);
+            padding: 32px;
+            transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 20;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
         }
 
-        .sidebar.open { right: 0; }
-        
-        .sidebar-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            cursor: pointer;
-            padding: 8px;
-            color: #94a3b8;
-        }
+        .sidebar.open { right: 24px; }
+        .sidebar-close { position: absolute; top: 20px; right: 20px; cursor: pointer; color: #cbd5e1; transition: 0.2s; }
+        .sidebar-close:hover { color: var(--primary); }
 
-        .profile-img-large {
-            width: 100px;
-            height: 100px;
+        .profile-avatar {
+            width: 80px; height: 80px;
             border-radius: 50%;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
-            border: 4px solid white;
+            background: var(--accent);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 600;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
 
-        .profile-name { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 5px; }
-        .profile-title { font-size: 14px; color: #64748b; font-weight: 500; margin-bottom: 20px; }
+        .profile-name { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .profile-title { font-size: 13px; color: #64748b; font-weight: 500; margin-bottom: 24px; }
         
-        .info-card {
+        .info-row {
             width: 100%;
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
-            text-align: left;
+            display: flex; justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
         }
-        
-        .info-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .info-value { font-size: 14px; color: #334155; font-weight: 500; }
+        .info-label { font-size: 12px; color: #94a3b8; font-weight: 500; }
+        .info-val { font-size: 13px; color: #334155; font-weight: 600; text-align: right;}
 
-        /* Loading Overlay */
+        /* Loader */
         #loader {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 999;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
         }
-        
         .spinner {
-            width: 40px; height: 40px;
-            border: 3px solid #e2e8f0;
-            border-top-color: var(--primary);
-            border-radius: 50%;
+            width: 40px; height: 40px; border: 3px solid #f1f5f9;
+            border-top-color: var(--primary); border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Responsive Mobile */
-        @media (max-width: 768px) {
-            .bottom-controls { flex-wrap: wrap; justify-content: center; width: 90%; }
-            .header-panel { padding: 10px 16px; margin-top: 10px; }
-            .search-input { width: 150px; }
-        }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <div style="margin-top: 15px; font-weight: 500; color: #64748b;">Organizasyon Yükleniyor...</div>
+        <div style="margin-top:15px; font-size:14px; color:#64748b; font-weight:500;">Loading Structure...</div>
     </div>
 
     <div id="network-container"></div>
 
     <div class="ui-layer">
-        
         <div class="header-panel">
             <div class="brand-icon"><i class="fas fa-sitemap"></i></div>
             <div class="brand-info">
                 <h1>PAMEKS</h1>
-                <p>Organizasyon Şeması</p>
+                <p>Digital Organization Chart</p>
             </div>
         </div>
 
         <div class="sidebar" id="sidebar">
             <div class="sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></div>
-            <img src="" id="sb-img" class="profile-img-large">
+            <div class="profile-avatar" id="sb-avatar"></div>
             <div class="profile-name" id="sb-name">-</div>
             <div class="profile-title" id="sb-title">-</div>
             
-            <div class="info-card">
-                <div class="info-label">Lokasyon</div>
-                <div class="info-value" id="sb-loc">-</div>
+            <div class="info-row">
+                <span class="info-label">Location</span>
+                <span class="info-val" id="sb-loc">-</span>
             </div>
-            <div class="info-card">
-                <div class="info-label">Departman / Grup</div>
-                <div class="info-value" id="sb-dept">-</div>
+            <div class="info-row">
+                <span class="info-label">Reports To</span>
+                <span class="info-val" id="sb-manager">-</span>
             </div>
-             <div class="info-card">
-                <div class="info-label">Yönetici</div>
-                <div class="info-value" id="sb-manager">-</div>
+            <div class="info-row" style="border:none; margin-top:10px;">
+                <span class="info-label">Status</span>
+                <span class="info-val" style="color:var(--accent)">Active</span>
             </div>
         </div>
 
         <div class="bottom-controls">
-            
-            <div class="control-group">
-                <select id="locationSelect" onchange="filterAndDraw()">
-                    <option value="Istanbul">🏢 Istanbul Merkez</option>
-                    <option value="Malkara">🏭 Malkara Fabrika</option>
+            <div class="control-item">
+                <select id="locationSelect" onchange="drawGraph()">
+                    <option value="Istanbul">Istanbul HQ</option>
+                    <option value="Malkara">Malkara Plant</option>
                 </select>
             </div>
-
-            <div class="control-group">
-                <button class="btn-mode active" id="btnNetwork" onclick="setView('network')">
-                    <i class="fas fa-project-diagram"></i> Network
-                </button>
-                <button class="btn-mode" id="btnTree" onclick="setView('tree')">
-                    <i class="fas fa-stream"></i> Hiyerarşi
-                </button>
-            </div>
-
-            <div class="control-group search-wrapper">
+            <div class="control-item">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" id="searchBox" placeholder="İsim ara..." onkeyup="handleSearch()">
+                <input type="text" class="search-input" id="searchBox" placeholder="Search employee..." onkeyup="handleSearch()">
             </div>
-
-            <div class="control-group">
-                 <button class="btn-mode" onclick="network.fit({animation:true})"><i class="fas fa-compress-arrows-alt"></i></button>
-            </div>
-
+            <button class="btn-icon" onclick="network.fit({animation:true})" title="Reset View">
+                <i class="fas fa-compress-arrows-alt"></i>
+            </button>
         </div>
     </div>
 
     <script>
-        // --- KONFİGÜRASYON ---
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS53ndrTBAgFEdi_57aoGwMsWukrhbuOaMUpk8haK7cB4Kc_kZVqfCLQ_OQGOWA4W-uc8PU4AMt5i3P/pub?gid=0&single=true&output=csv";
         
         let network = null;
         let allData = [];
-        let currentView = 'network'; // 'network' veya 'tree'
-        
-        // --- VERİ ÇEKME ---
+        let nodes = [];
+        let edges = [];
+
+        // 1. Fetch Data
         Papa.parse(CSV_URL, {
             download: true,
             header: true,
             complete: function(results) {
-                // Veri temizliği: ID'si boş olanları at
                 allData = results.data.filter(d => d.ID && d.ID.trim() !== "");
-                console.log("Veri Yüklendi:", allData.length);
-                
-                // Başlangıçta çiz
-                initVisNetwork();
+                drawGraph();
                 document.getElementById('loader').style.display = 'none';
             },
-            error: function(err) {
-                alert("Veri yüklenemedi. Linki kontrol edin.");
-                console.error(err);
-            }
+            error: (err) => console.error("CSV Error", err)
         });
 
-        // --- VIS.JS BAŞLATMA VE ÇİZİM ---
-        function initVisNetwork() {
+        // 2. Main Drawing Function
+        function drawGraph() {
             const container = document.getElementById('network-container');
-            const data = getFilteredData();
+            const selectedLoc = document.getElementById('locationSelect').value;
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+
+            // Filter Data
+            let filteredData = allData.filter(item => 
+                item.Lokasyon && item.Lokasyon.trim() === selectedLoc
+            );
+
+            // Search Logic
+            if (searchTerm.length > 1) {
+                filteredData = filteredData.filter(item => 
+                    item.ID.toLowerCase().includes(searchTerm) || 
+                    item.Title.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // HIERARCHY LOGIC: Calculate levels for sizing
+            // Level 0 = Top Manager (No manager in current list)
+            // Level 1 = Direct Reports
+            // Level 2 = Others
+            const levelMap = new Map();
             
-            // Genel Ayarlar
-            const options = {
-                nodes: {
-                    shape: 'circularImage',
-                    borderWidth: 3,
-                    size: 30,
+            // Find root(s)
+            filteredData.forEach(p => {
+                const hasManager = filteredData.find(m => m.ID === p.Manager_ID);
+                if (!hasManager) levelMap.set(p.ID, 0); // Root
+            });
+
+            // Calculate recursive levels
+            function calcLevels(managerId, currentLevel) {
+                const reports = filteredData.filter(p => p.Manager_ID === managerId);
+                reports.forEach(r => {
+                    levelMap.set(r.ID, currentLevel + 1);
+                    calcLevels(r.ID, currentLevel + 1);
+                });
+            }
+
+            // Start calculation from roots
+            levelMap.forEach((lvl, id) => {
+                if (lvl === 0) calcLevels(id, 0);
+            });
+
+            // Create Nodes & Edges
+            nodes = filteredData.map(person => {
+                const level = levelMap.get(person.ID) || 2; // Default to lowest if unclear
+                
+                // VISUAL HIERARCHY SETTINGS
+                let size = 20; 
+                let color = "#cbd5e1"; // Default Gray
+                let font = { size: 14, color: "#475569", face: "Inter", vadjust: 0 };
+
+                if (level === 0) {
+                    size = 50; // BIGGEST (Center)
+                    color = "#0f172a"; // Darkest
+                    font = { size: 22, color: "#0f172a", face: "Inter", weight: "bold" };
+                } else if (level === 1) {
+                    size = 35; // MEDIUM (Direct Report)
+                    color = "#3b82f6"; // Blue
+                    font = { size: 16, color: "#1e293b", face: "Inter" };
+                } else {
+                    size = 15; // SMALLEST
+                    color = "#94a3b8";
+                    font = { size: 12, color: "#64748b", face: "Inter" };
+                }
+
+                return {
+                    id: person.ID,
+                    label: `<b>${person.ID}</b>\n${person.Title}`, // Name on top, Title below
+                    title: person.Title,
+                    shape: 'dot', // No initials, just clean dot
+                    size: size,
                     color: {
-                        border: '#ffffff',
-                        background: '#ffffff',
-                        highlight: { border: '#2563eb', background: '#ffffff' }
+                        background: color,
+                        border: "white",
+                        highlight: { background: "#f59e0b", border: "white" }
                     },
-                    font: { 
-                        color: '#334155', 
-                        size: 14, 
-                        face: 'Inter',
-                        multi: true,
-                        vadjust: 2
+                    borderWidth: 4,
+                    font: { multi: 'html', ...font },
+                    shadow: { enabled: true, color: 'rgba(0,0,0,0.1)', size: 10, x: 0, y: 5 }
+                };
+            });
+
+            edges = filteredData
+                .filter(p => p.Manager_ID && filteredData.find(m => m.ID === p.Manager_ID))
+                .map(p => ({
+                    from: p.Manager_ID,
+                    to: p.ID,
+                    color: { color: "#e2e8f0", opacity: 0.8 },
+                    width: 2
+                }));
+
+            const data = { nodes: nodes, edges: edges };
+
+            const options = {
+                layout: {
+                    improvedLayout: true
+                },
+                physics: {
+                    enabled: true,
+                    // BARNES HUT: Good for hierarchical starbursts
+                    barnesHut: {
+                        gravitationalConstant: -4000, // Strong repulsion to spread out
+                        centralGravity: 0.3, // Pulls center to middle
+                        springLength: 150, // Length of lines
+                        springConstant: 0.04,
+                        damping: 0.09,
+                        avoidOverlap: 1 // Crucial for preventing overlap
                     },
-                    shadow: {
+                    stabilization: {
                         enabled: true,
-                        color: 'rgba(0,0,0,0.1)',
-                        size: 10,
-                        x: 0, y: 5
+                        iterations: 1000 // Pre-calculate to avoid messy start
                     }
                 },
-                edges: {
-                    color: { color: '#cbd5e1', highlight: '#2563eb' },
-                    width: 1.5,
-                    smooth: { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }
+                nodes: {
+                    shapeProperties: {
+                        interpolation: false // Crisp borders
+                    }
                 },
                 interaction: {
                     hover: true,
                     tooltipDelay: 200,
                     zoomView: true
-                },
-                physics: getPhysicsOptions('network') // Başlangıç fiziği
+                }
             };
 
+            // Initialize Network
+            if (network) network.destroy();
             network = new vis.Network(container, data, options);
 
-            // Tıklama Olayı (Sidebar açmak için)
-            network.on("click", function (params) {
+            // Click Event for Sidebar
+            network.on("click", function(params) {
                 if (params.nodes.length > 0) {
-                    const nodeId = params.nodes[0];
-                    const person = allData.find(p => p.ID === nodeId);
-                    if(person) openSidebar(person);
+                    const person = allData.find(p => p.ID === params.nodes[0]);
+                    openSidebar(person);
                 } else {
                     closeSidebar();
                 }
             });
         }
 
-        // --- GÖRÜNÜM DEĞİŞTİRME FONKSİYONU ---
-        function setView(mode) {
-            currentView = mode;
-            
-            // Butonların aktifliğini güncelle
-            document.getElementById('btnNetwork').classList.toggle('active', mode === 'network');
-            document.getElementById('btnTree').classList.toggle('active', mode === 'tree');
-
-            const options = {
-                physics: getPhysicsOptions(mode),
-                layout: getLayoutOptions(mode),
-                edges: {
-                    smooth: mode === 'network' 
-                        ? { type: 'continuous' } 
-                        : { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }
-                }
-            };
-            
-            network.setOptions(options);
-            
-            // Ağaç modunda her şeyi ekrana sığdır
-            if(mode === 'tree') {
-                setTimeout(() => network.fit({animation: true}), 500);
-            }
-        }
-
-        // --- FİZİK VE LAYOUT AYARLARI (SİHİRLİ KISIM) ---
-        function getPhysicsOptions(mode) {
-            if (mode === 'network') {
-                // RESİMDEKİ GİBİ ORGANİK YAPI İÇİN
-                return {
-                    enabled: true,
-                    forceAtlas2Based: {
-                        gravitationalConstant: -100, // Düğümleri birbirinden iter (blobs oluşturur)
-                        centralGravity: 0.005,      // Merkeze hafifçe çeker
-                        springLength: 150,          // Bağlantı uzunluğu
-                        springConstant: 0.05,
-                        damping: 0.4
-                    },
-                    solver: 'forceAtlas2Based',
-                    stabilization: { iterations: 150 }
-                };
-            } else {
-                // AĞAÇ MODUNDA FİZİK KAPALI (SABİT DURMASI İÇİN)
-                return {
-                    enabled: false
-                };
-            }
-        }
-
-        function getLayoutOptions(mode) {
-            if (mode === 'tree') {
-                // DÜZENLİ HİYERARŞİ (Üst üste binmeyi engeller)
-                return {
-                    hierarchical: {
-                        enabled: true,
-                        direction: 'UD',        // Yukarıdan Aşağı (Up-Down)
-                        sortMethod: 'directed', // Yönetici ilişkisine göre sırala
-                        levelSeparation: 180,   // Katmanlar arası boşluk
-                        nodeSpacing: 250,       // Yan yana nodlar arası boşluk (Bunu artırdık)
-                        treeSpacing: 250,       // Ağaçlar arası boşluk
-                        blockShifting: true,
-                        edgeMinimization: true,
-                        parentCentralization: true,
-                        shakeTowards: 'leaves'
-                    }
-                };
-            } else {
-                // NETWORK MODUNDA HİYERARŞİ KAPALI
-                return {
-                    hierarchical: { enabled: false }
-                };
-            }
-        }
-
-        // --- VERİ HAZIRLAMA ---
-        function getFilteredData() {
-            const selectedLoc = document.getElementById('locationSelect').value;
-            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-            
-            // 1. Lokasyon Filtresi
-            let filtered = allData.filter(item => 
-                item.Lokasyon && item.Lokasyon.trim() === selectedLoc
-            );
-
-            // 2. Arama Filtresi
-            if (searchTerm.length > 1) {
-                // Arama varsa sadece ilgili kişiyi ve yöneticilerini/astlarını getir (Path finding)
-                // Şimdilik basitçe isme göre filtreleyelim
-                filtered = filtered.filter(item => 
-                    item.ID.toLowerCase().includes(searchTerm) || 
-                    item.Title.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            const nodes = [];
-            const edges = [];
-
-            filtered.forEach(person => {
-                // Avatar oluştur (İsim baş harfleriyle)
-                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.ID)}&background=random&color=fff&size=128&bold=true`;
-                
-                // Başlıkları (Title) satırlara bölmek için (uzun unvanlar için)
-                const label = `<b>${person.ID}</b>\n${person.Title.substring(0, 20)}${person.Title.length>20?'...':''}`;
-
-                nodes.push({
-                    id: person.ID,
-                    label: label,
-                    title: person.Title, // Tooltip
-                    image: avatarUrl,
-                    // Eğer yönetici ise biraz daha büyük yap
-                    size: person.Manager_ID ? 35 : 50, 
-                    font: { multi: 'html' }
-                });
-
-                if (person.Manager_ID) {
-                    // Yönetici de bu listede var mı kontrol et (Filtreleme hatası olmasın)
-                    const managerExists = filtered.find(m => m.ID === person.Manager_ID);
-                    if (managerExists) {
-                        edges.push({
-                            from: person.Manager_ID,
-                            to: person.ID
-                        });
-                    }
-                }
-            });
-
-            return { nodes: nodes, edges: edges };
-        }
-
-        // --- ARAMA VE GÜNCELLEME ---
-        function filterAndDraw() {
-            const data = getFilteredData();
-            network.setData(data);
-            
-            // Eğer ağaç modundaysak tekrar düzenle
-            if(currentView === 'tree') {
-                network.setOptions({ layout: getLayoutOptions('tree') });
-            }
-        }
-
+        // Search Handling
         function handleSearch() {
-            // Arama yaparken biraz bekle (performans)
             clearTimeout(window.searchTimeout);
-            window.searchTimeout = setTimeout(filterAndDraw, 500);
+            window.searchTimeout = setTimeout(drawGraph, 600);
         }
 
-        // --- SIDEBAR İŞLEMLERİ ---
+        // Sidebar Functions
         function openSidebar(person) {
-            document.getElementById('sb-img').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.ID)}&background=2563eb&color=fff&size=256`;
+            const sb = document.getElementById('sidebar');
+            const initials = person.ID.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+            
+            document.getElementById('sb-avatar').innerText = initials;
             document.getElementById('sb-name').innerText = person.ID;
             document.getElementById('sb-title').innerText = person.Title;
             document.getElementById('sb-loc').innerText = person.Lokasyon;
-            document.getElementById('sb-dept').innerText = "Genel"; // CSV'de departman yoksa genel
-            document.getElementById('sb-manager').innerText = person.Manager_ID || "En Üst Yönetici";
+            document.getElementById('sb-manager').innerText = person.Manager_ID || "Board / CEO";
             
-            document.getElementById('sidebar').classList.add('open');
+            sb.classList.add('open');
         }
 
         function closeSidebar() {
