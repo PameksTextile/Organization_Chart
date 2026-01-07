@@ -1,892 +1,580 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pameks Organization Chart</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Pameks Dijital Organizasyon</title>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
-            /* PAMEKS KURUMSAL RENKLERİ */
-            --pameks-blue-dark: #1e3a5f;
-            --pameks-blue-medium: #2d5a8c;
-            --pameks-blue-light: #5b9bd5;    /* Açık mavi - çizgiler için */
-            --pameks-accent: #7fb3d5;        /* Daha açık mavi - hover için */
-            --bg-blue: #1e3a5f;
+            --primary: #2563eb; /* Modern Mavi */
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.85);
+            --border: rgba(0, 0, 0, 0.08);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: var(--bg-blue);
-            margin: 0; 
-            padding: 0;
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9; /* Çok açık gri, göz yormaz */
             height: 100vh;
-            display: flex;
-            flex-direction: column;
             overflow: hidden;
-            position: relative;
+            color: var(--dark);
         }
 
-        /* ANIMATED BACKGROUND */
-        #particles-js {
-            position: absolute;
+        /* TAM EKRAN CANVAS */
+        #network-container {
             width: 100%;
             height: 100%;
-            z-index: 0;
-            opacity: 0.12;
+            background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
         }
 
-        /* NET HEADER - BLUR YOK */
-        .header {
-            background: rgba(255, 255, 255, 0.98);
-            padding: 18px 40px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-            z-index: 100;
+        /* MODERN UI KATMANLARI */
+        .ui-layer {
+            position: absolute;
+            z-index: 10;
+            pointer-events: none; /* Tıklamalar arkaya geçsin */
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(30, 58, 95, 0.08);
-            position: relative;
+            padding: 20px;
         }
 
-        /* LOGO */
-        .logo-section {
-            display: flex;
+        /* HEADER - SOL ÜST */
+        .header-panel {
+            pointer-events: auto;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 16px 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255,255,255,0.5);
+            display: inline-flex;
             align-items: center;
-            gap: 14px;
+            gap: 15px;
+            max-width: 400px;
         }
 
-        .logo-icon {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, var(--pameks-blue-dark) 0%, var(--pameks-blue-medium) 100%);
-            border-radius: 10px;
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            color: white;
-            box-shadow: 0 3px 10px rgba(30, 58, 95, 0.15);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
-        .logo-icon:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(30, 58, 95, 0.25);
-        }
+        .brand-info h1 { font-size: 16px; font-weight: 700; color: #1e293b; }
+        .brand-info p { font-size: 12px; color: #64748b; }
 
-        .logo-text {
-            color: var(--pameks-blue-dark);
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-        }
-
-        .logo-tagline {
-            font-size: 10px;
-            color: #8898aa;
-            font-weight: 400;
-            letter-spacing: 0.2px;
-            margin-top: 1px;
-        }
-
-        /* CONTROLS */
-        .controls {
+        /* ALT KONTROL PANELİ (Resimdeki gibi) */
+        .bottom-controls {
+            pointer-events: auto;
+            align-self: center;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 10px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.6);
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .control-group {
+            display: flex;
             align-items: center;
+            background: rgba(255,255,255,0.5);
+            border-radius: 14px;
+            padding: 4px;
+            border: 1px solid rgba(0,0,0,0.04);
         }
 
-        select, .zoom-btn, .theme-toggle, .view-toggle {
-            padding: 9px 18px;
+        .btn-mode {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: #64748b;
             font-size: 13px;
-            font-weight: 500;
-            color: var(--pameks-blue-dark);
-            border: 1px solid rgba(30, 58, 95, 0.12);
-            border-radius: 8px;
-            background: white;
+            font-weight: 600;
             cursor: pointer;
-            outline: none;
             transition: all 0.3s ease;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-        }
-
-        select:hover, .zoom-btn:hover, .theme-toggle:hover, .view-toggle:hover {
-            background: var(--pameks-blue-dark);
-            color: white;
-            border-color: var(--pameks-blue-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(30, 58, 95, 0.15);
-        }
-
-        .view-toggle.active {
-            background: var(--pameks-blue-dark);
-            color: white;
-        }
-
-        select option {
-            background: white;
-            color: var(--pameks-blue-dark);
-        }
-
-        .zoom-controls {
             display: flex;
-            gap: 5px;
+            align-items: center;
+            gap: 8px;
         }
 
-        .zoom-btn {
-            padding: 8px 13px;
-            font-size: 13px;
-        }
-
-        /* SEARCH */
-        .search-container {
-            position: relative;
-        }
-
-        #searchBox {
-            padding: 9px 16px 9px 38px;
-            font-size: 13px;
-            font-weight: 400;
-            color: var(--pameks-blue-dark);
-            border: 1px solid rgba(30, 58, 95, 0.12);
-            border-radius: 8px;
+        .btn-mode.active {
             background: white;
-            outline: none;
-            width: 220px;
-            transition: all 0.3s ease;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        #searchBox::placeholder {
-            color: #a0aec0;
-            font-weight: 300;
+        .btn-mode:hover:not(.active) {
+            color: #334155;
+            background: rgba(255,255,255,0.8);
         }
 
-        #searchBox:focus {
-            width: 260px;
-            border-color: var(--pameks-blue-light);
-            box-shadow: 0 3px 10px rgba(91, 155, 213, 0.2);
+        .search-wrapper {
+            position: relative;
+            margin-left: 10px;
+        }
+
+        .search-input {
+            padding: 10px 16px 10px 36px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: white;
+            font-size: 13px;
+            width: 200px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            width: 240px;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .search-icon {
             position: absolute;
-            left: 13px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: #a0aec0;
-            font-size: 13px;
+            color: #94a3b8;
+            font-size: 14px;
         }
 
-        /* CHART CONTAINERS */
-        #hierarchyView, #networkView {
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            position: relative;
-            z-index: 1;
-        }
-
-        #hierarchyView {
-            overflow: auto;
-            padding: 50px 40px 80px;
-            text-align: center;
-            cursor: grab;
-        }
-
-        #hierarchyView:active {
-            cursor: grabbing;
-        }
-
-        #networkView {
-            display: none;
-        }
-
-        /* NETWORK CANVAS */
-        #mynetwork {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* SCROLLBAR */
-        #hierarchyView::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        #hierarchyView::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 4px;
-        }
-
-        #hierarchyView::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
-        }
-
-        #hierarchyView::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        /* ORG CHART NODES */
-        .org-chart {
-            display: inline-block;
-            text-align: center;
-        }
-
-        .node {
-            display: inline-block;
-            margin: 0 15px;
-            vertical-align: top;
-        }
-
-        .node-card {
+        select {
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid transparent;
             background: white;
-            border-radius: 18px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            width: 220px;
-            animation: fadeInUp 0.5s ease-out backwards;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .node-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--pameks-blue-light) 0%, var(--pameks-accent) 100%);
-            opacity: 0.9;
-        }
-
-        .node:hover .node-card {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
-        }
-
-        .node-content {
-            padding: 22px 16px;
-            text-align: center;
-        }
-
-        .node-title {
             font-size: 13px;
-            font-weight: 600;
-            color: var(--pameks-blue-dark);
-            margin-bottom: 8px;
-            line-height: 1.4;
+            color: #475569;
+            cursor: pointer;
         }
 
-        .node-name {
-            font-size: 12px;
-            font-weight: 400;
-            color: #8898aa;
-            line-height: 1.5;
-        }
-
-        /* CONNECTIONS - AÇIK MAVİ */
-        .children {
-            position: relative;
-            padding-top: 30px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .children::before {
-            content: '';
+        /* SIDEBAR (Detay Paneli) */
+        .sidebar {
+            pointer-events: auto;
             position: absolute;
-            top: 0;
-            left: 50%;
-            width: 2px;
-            height: 30px;
-            background: var(--pameks-blue-light);
-            opacity: 0.7;
-        }
-
-        .children .node::before {
-            content: '';
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            width: 2px;
-            height: 30px;
-            background: var(--pameks-blue-light);
-            opacity: 0.7;
-        }
-
-        .children .node::after {
-            content: '';
-            position: absolute;
-            top: -30px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--pameks-blue-light);
-            opacity: 0.7;
-        }
-
-        .children .node:first-child::after {
-            left: 50%;
-        }
-
-        .children .node:last-child::after {
-            right: 50%;
-        }
-
-        .children .node:only-child::after {
-            display: none;
-        }
-
-        /* LOADING */
-        #loading {
-            margin-top: 100px;
-            font-size: 15px;
-            color: white;
-            font-weight: 400;
+            right: -320px;
+            top: 20px;
+            bottom: 20px;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px 0 0 20px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+            padding: 30px;
+            transition: right 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 20;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 18px;
+            text-align: center;
         }
 
-        .loader {
-            width: 45px;
-            height: 45px;
-            border: 3px solid rgba(255, 255, 255, 0.15);
-            border-top-color: white;
+        .sidebar.open { right: 0; }
+        
+        .sidebar-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            padding: 8px;
+            color: #94a3b8;
+        }
+
+        .profile-img-large {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+            border: 4px solid white;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .profile-name { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 5px; }
+        .profile-title { font-size: 14px; color: #64748b; font-weight: 500; margin-bottom: 20px; }
+        
+        .info-card {
+            width: 100%;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: left;
         }
+        
+        .info-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .info-value { font-size: 14px; color: #334155; font-weight: 500; }
 
-        /* RESPONSIVE */
-        @media (max-width: 1200px) {
-            .header {
-                flex-wrap: wrap;
-                gap: 10px;
-                justify-content: center;
-            }
-
-            #searchBox {
-                width: 180px;
-            }
-
-            #searchBox:focus {
-                width: 200px;
-            }
+        /* Loading Overlay */
+        #loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
+        
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Responsive Mobile */
         @media (max-width: 768px) {
-            .node-card {
-                width: 180px;
-            }
-
-            .node-title { font-size: 12px; }
-            .node-name { font-size: 11px; }
-
-            .logo-text {
-                font-size: 17px;
-            }
+            .bottom-controls { flex-wrap: wrap; justify-content: center; width: 90%; }
+            .header-panel { padding: 10px 16px; margin-top: 10px; }
+            .search-input { width: 150px; }
         }
-
-        /* DARK THEME */
-        body.dark-theme {
-            background: #0f1419;
-        }
-
-        body.dark-theme .header,
-        body.dark-theme .node-card,
-        body.dark-theme select,
-        body.dark-theme .zoom-btn,
-        body.dark-theme .theme-toggle,
-        body.dark-theme .view-toggle,
-        body.dark-theme #searchBox {
-            background: rgba(30, 40, 55, 0.95);
-            color: white;
-            border-color: rgba(255, 255, 255, 0.08);
-        }
-
-        body.dark-theme .logo-text,
-        body.dark-theme .node-title,
-        body.dark-theme #loading {
-            color: white;
-        }
-
-        body.dark-theme .node-name {
-            color: #8898aa;
-        }
-
-        body.dark-theme #searchBox::placeholder {
-            color: #6c757d;
-        }
-
-        body.dark-theme .search-icon {
-            color: #6c757d;
-        }
-
-        body.dark-theme select option {
-            background: #1e2837;
-            color: white;
-        }
-
     </style>
 </head>
 <body>
 
-    <!-- ANIMATED BACKGROUND -->
-    <div id="particles-js"></div>
+    <div id="loader">
+        <div class="spinner"></div>
+        <div style="margin-top: 15px; font-weight: 500; color: #64748b;">Organizasyon Yükleniyor...</div>
+    </div>
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="logo-section">
-            <div class="logo-icon">
-                <i class="fas fa-sitemap"></i>
-            </div>
-            <div>
-                <div class="logo-text">PAMEKS</div>
-                <div class="logo-tagline">Organization Structure</div>
+    <div id="network-container"></div>
+
+    <div class="ui-layer">
+        
+        <div class="header-panel">
+            <div class="brand-icon"><i class="fas fa-sitemap"></i></div>
+            <div class="brand-info">
+                <h1>PAMEKS</h1>
+                <p>Organizasyon Şeması</p>
             </div>
         </div>
 
-        <div class="controls">
-            <div class="search-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></div>
+            <img src="" id="sb-img" class="profile-img-large">
+            <div class="profile-name" id="sb-name">-</div>
+            <div class="profile-title" id="sb-title">-</div>
+            
+            <div class="info-card">
+                <div class="info-label">Lokasyon</div>
+                <div class="info-value" id="sb-loc">-</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Departman / Grup</div>
+                <div class="info-value" id="sb-dept">-</div>
+            </div>
+             <div class="info-card">
+                <div class="info-label">Yönetici</div>
+                <div class="info-value" id="sb-manager">-</div>
+            </div>
+        </div>
+
+        <div class="bottom-controls">
+            
+            <div class="control-group">
+                <select id="locationSelect" onchange="filterAndDraw()">
+                    <option value="Istanbul">🏢 Istanbul Merkez</option>
+                    <option value="Malkara">🏭 Malkara Fabrika</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <button class="btn-mode active" id="btnNetwork" onclick="setView('network')">
+                    <i class="fas fa-project-diagram"></i> Network
+                </button>
+                <button class="btn-mode" id="btnTree" onclick="setView('tree')">
+                    <i class="fas fa-stream"></i> Hiyerarşi
+                </button>
+            </div>
+
+            <div class="control-group search-wrapper">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchBox" placeholder="Search name or title..." oninput="updateView()">
+                <input type="text" class="search-input" id="searchBox" placeholder="İsim ara..." onkeyup="handleSearch()">
             </div>
 
-            <select id="locationSelect" onchange="updateView()">
-                <option value="Istanbul">🏢 Istanbul HQ</option>
-                <option value="Malkara">🏭 Malkara Plant</option>
-            </select>
-
-            <button class="view-toggle active" id="hierarchyBtn" onclick="switchView('hierarchy')">
-                <i class="fas fa-sitemap"></i> Tree
-            </button>
-            <button class="view-toggle" id="networkBtn" onclick="switchView('network')">
-                <i class="fas fa-project-diagram"></i> Network
-            </button>
-
-            <div class="zoom-controls">
-                <button class="zoom-btn" onclick="zoomChart(1.2)" title="Zoom In">
-                    <i class="fas fa-search-plus"></i>
-                </button>
-                <button class="zoom-btn" onclick="zoomChart(0.8)" title="Zoom Out">
-                    <i class="fas fa-search-minus"></i>
-                </button>
-                <button class="zoom-btn" onclick="resetZoom()" title="Reset">
-                    <i class="fas fa-redo"></i>
-                </button>
+            <div class="control-group">
+                 <button class="btn-mode" onclick="network.fit({animation:true})"><i class="fas fa-compress-arrows-alt"></i></button>
             </div>
 
-            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
-                <i class="fas fa-moon" id="themeIcon"></i>
-            </button>
         </div>
     </div>
 
-    <!-- HIERARCHY VIEW -->
-    <div id="hierarchyView">
-        <div id="loading">
-            <div class="loader"></div>
-            <div>Loading Organization Chart...</div>
-        </div>
-    </div>
-
-    <!-- NETWORK VIEW -->
-    <div id="networkView">
-        <div id="mynetwork"></div>
-    </div>
-
-    <script type="text/javascript">
-        // PARTICLES
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 45, density: { enable: true, value_area: 800 } },
-                color: { value: '#ffffff' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.25, random: true },
-                size: { value: 2, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 140,
-                    color: '#ffffff',
-                    opacity: 0.15,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 0.8,
-                    direction: 'none',
-                    random: true,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
-                }
+    <script>
+        // --- KONFİGÜRASYON ---
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS53ndrTBAgFEdi_57aoGwMsWukrhbuOaMUpk8haK7cB4Kc_kZVqfCLQ_OQGOWA4W-uc8PU4AMt5i3P/pub?gid=0&single=true&output=csv";
+        
+        let network = null;
+        let allData = [];
+        let currentView = 'network'; // 'network' veya 'tree'
+        
+        // --- VERİ ÇEKME ---
+        Papa.parse(CSV_URL, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                // Veri temizliği: ID'si boş olanları at
+                allData = results.data.filter(d => d.ID && d.ID.trim() !== "");
+                console.log("Veri Yüklendi:", allData.length);
+                
+                // Başlangıçta çiz
+                initVisNetwork();
+                document.getElementById('loader').style.display = 'none';
             },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, mode: 'grab' },
-                    resize: true
-                },
-                modes: {
-                    grab: {
-                        distance: 100,
-                        line_linked: { opacity: 0.3 }
-                    }
-                }
-            },
-            retina_detect: true
+            error: function(err) {
+                alert("Veri yüklenemedi. Linki kontrol edin.");
+                console.error(err);
+            }
         });
 
-        // CSV LINK
-        const csvLink = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS53ndrTBAgFEdi_57aoGwMsWukrhbuOaMUpk8haK7cB4Kc_kZVqfCLQ_OQGOWA4W-uc8PU4AMt5i3P/pub?gid=0&single=true&output=csv";
-
-        let allData = [];
-        let currentZoom = 1;
-        let currentView = 'hierarchy';
-        let network = null;
-
-        fetchData();
-
-        function fetchData() {
-            Papa.parse(csvLink, {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    allData = results.data.filter(item => item.ID && item.Title && item.Lokasyon);
-                    console.log("✅ Data loaded:", allData.length, "records");
-                    updateView();
-                },
-                error: function(err) {
-                    console.error("❌ CSV Error:", err);
-                    document.getElementById('loading').innerHTML = `
-                        <div class="loader"></div>
-                        <div style="color:#7fb3d5; margin-top:10px;">Data Load Error</div>
-                        <div style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:6px;">
-                            Please check CSV link
-                        </div>
-                    `;
-                }
-            });
-        }
-
-        // HIERARCHY TREE WITH SEARCH
-        function getHierarchyTree(data, searchTerm) {
-            if (!searchTerm) return data;
-
-            const matchedItems = data.filter(item => 
-                item.ID.toLowerCase().includes(searchTerm) || 
-                item.Title.toLowerCase().includes(searchTerm)
-            );
-
-            if (matchedItems.length === 0) return [];
-
-            const hierarchySet = new Set();
+        // --- VIS.JS BAŞLATMA VE ÇİZİM ---
+        function initVisNetwork() {
+            const container = document.getElementById('network-container');
+            const data = getFilteredData();
             
-            matchedItems.forEach(matchedItem => {
-                hierarchySet.add(matchedItem.ID);
-                
-                let currentManager = matchedItem.Manager_ID;
-                while (currentManager) {
-                    hierarchySet.add(currentManager);
-                    const manager = data.find(item => item.ID === currentManager);
-                    currentManager = manager ? manager.Manager_ID : null;
-                }
-
-                function addSubordinates(managerId) {
-                    const subordinates = data.filter(item => item.Manager_ID === managerId);
-                    subordinates.forEach(sub => {
-                        hierarchySet.add(sub.ID);
-                        addSubordinates(sub.ID);
-                    });
-                }
-                addSubordinates(matchedItem.ID);
-            });
-
-            return data.filter(item => hierarchySet.has(item.ID));
-        }
-
-        function updateView() {
-            if (currentView === 'hierarchy') {
-                drawHierarchy();
-            } else {
-                drawNetwork();
-            }
-        }
-
-        function drawHierarchy() {
-            const selectedLocation = document.getElementById('locationSelect').value;
-            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-            const container = document.getElementById('hierarchyView');
-
-            let locationFiltered = allData.filter(item => 
-                item.Lokasyon && item.Lokasyon.trim() === selectedLocation
-            );
-
-            let filteredData = getHierarchyTree(locationFiltered, searchTerm);
-
-            if (filteredData.length === 0) {
-                container.innerHTML = `
-                    <div style="margin-top:100px; text-align:center;">
-                        <div style="font-size:50px; margin-bottom:18px; opacity:0.4;">🔍</div>
-                        <div style="font-size:18px; color:white; font-weight:500;">No Results Found</div>
-                        <div style="font-size:13px; color:rgba(255,255,255,0.5); margin-top:6px; font-weight:300;">
-                            Try different search terms
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            // BUILD TREE
-            const root = filteredData.find(item => !item.Manager_ID || !filteredData.find(m => m.ID === item.Manager_ID));
-            
-            function buildNode(person, delay = 0) {
-                const children = filteredData.filter(item => item.Manager_ID === person.ID);
-                
-                let html = `
-                    <div class="node">
-                        <div class="node-card" style="animation-delay: ${delay}s;">
-                            <div class="node-content">
-                                <div class="node-title">${person.Title}</div>
-                                <div class="node-name">${person.ID}</div>
-                            </div>
-                        </div>
-                `;
-                
-                if (children.length > 0) {
-                    html += '<div class="children">';
-                    children.forEach((child, idx) => {
-                        html += buildNode(child, delay + (idx * 0.05));
-                    });
-                    html += '</div>';
-                }
-                
-                html += '</div>';
-                return html;
-            }
-
-            container.innerHTML = `<div class="org-chart">${buildNode(root)}</div>`;
-
-            // ANIMATE
-            setTimeout(() => {
-                gsap.from('.node-card', {
-                    duration: 0.5,
-                    opacity: 0,
-                    y: 20,
-                    stagger: 0.04,
-                    ease: 'power2.out'
-                });
-            }, 50);
-        }
-
-        function drawNetwork() {
-            const selectedLocation = document.getElementById('locationSelect').value;
-            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-
-            let locationFiltered = allData.filter(item => 
-                item.Lokasyon && item.Lokasyon.trim() === selectedLocation
-            );
-
-            let filteredData = getHierarchyTree(locationFiltered, searchTerm);
-
-            if (filteredData.length === 0) {
-                document.getElementById('mynetwork').innerHTML = `
-                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;">
-                        <div style="font-size:50px; margin-bottom:18px; opacity:0.4;">🔍</div>
-                        <div style="font-size:18px; color:white; font-weight:500;">No Results Found</div>
-                    </div>
-                `;
-                return;
-            }
-
-            // CREATE NETWORK DATA
-            const nodes = filteredData.map(item => ({
-                id: item.ID,
-                label: item.ID,
-                title: item.Title,
-                shape: 'circularImage',
-                image: `https://ui-avatars.com/api/?name=${encodeURIComponent(item.ID)}&background=5b9bd5&color=fff&size=128`,
-                size: item.Manager_ID ? 25 : 35,
-                font: {
-                    size: 12,
-                    color: '#ffffff',
-                    face: 'Poppins'
-                },
-                borderWidth: 3,
-                borderWidthSelected: 4,
-                color: {
-                    border: '#5b9bd5',
-                    background: '#ffffff',
-                    highlight: {
-                        border: '#7fb3d5',
-                        background: '#ffffff'
-                    }
-                }
-            }));
-
-            const edges = filteredData
-                .filter(item => item.Manager_ID)
-                .map(item => ({
-                    from: item.Manager_ID,
-                    to: item.ID,
-                    color: {
-                        color: '#5b9bd5',
-                        highlight: '#7fb3d5',
-                        opacity: 0.7
-                    },
-                    width: 2,
-                    smooth: {
-                        type: 'cubicBezier',
-                        roundness: 0.5
-                    }
-                }));
-
-            const data = { nodes: nodes, edges: edges };
-
+            // Genel Ayarlar
             const options = {
-                layout: {
-                    hierarchical: {
-                        direction: 'UD',
-                        sortMethod: 'directed',
-                        levelSeparation: 150,
-                        nodeSpacing: 180
+                nodes: {
+                    shape: 'circularImage',
+                    borderWidth: 3,
+                    size: 30,
+                    color: {
+                        border: '#ffffff',
+                        background: '#ffffff',
+                        highlight: { border: '#2563eb', background: '#ffffff' }
+                    },
+                    font: { 
+                        color: '#334155', 
+                        size: 14, 
+                        face: 'Inter',
+                        multi: true,
+                        vadjust: 2
+                    },
+                    shadow: {
+                        enabled: true,
+                        color: 'rgba(0,0,0,0.1)',
+                        size: 10,
+                        x: 0, y: 5
                     }
                 },
-                physics: {
-                    enabled: false
+                edges: {
+                    color: { color: '#cbd5e1', highlight: '#2563eb' },
+                    width: 1.5,
+                    smooth: { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }
                 },
                 interaction: {
                     hover: true,
                     tooltipDelay: 200,
-                    zoomView: true,
-                    dragView: true
-                }
+                    zoomView: true
+                },
+                physics: getPhysicsOptions('network') // Başlangıç fiziği
             };
 
-            const container = document.getElementById('mynetwork');
             network = new vis.Network(container, data, options);
+
+            // Tıklama Olayı (Sidebar açmak için)
+            network.on("click", function (params) {
+                if (params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    const person = allData.find(p => p.ID === nodeId);
+                    if(person) openSidebar(person);
+                } else {
+                    closeSidebar();
+                }
+            });
         }
 
-        function switchView(view) {
-            currentView = view;
+        // --- GÖRÜNÜM DEĞİŞTİRME FONKSİYONU ---
+        function setView(mode) {
+            currentView = mode;
             
-            if (view === 'hierarchy') {
-                document.getElementById('hierarchyView').style.display = 'block';
-                document.getElementById('networkView').style.display = 'none';
-                document.getElementById('hierarchyBtn').classList.add('active');
-                document.getElementById('networkBtn').classList.remove('active');
-                drawHierarchy();
+            // Butonların aktifliğini güncelle
+            document.getElementById('btnNetwork').classList.toggle('active', mode === 'network');
+            document.getElementById('btnTree').classList.toggle('active', mode === 'tree');
+
+            const options = {
+                physics: getPhysicsOptions(mode),
+                layout: getLayoutOptions(mode),
+                edges: {
+                    smooth: mode === 'network' 
+                        ? { type: 'continuous' } 
+                        : { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }
+                }
+            };
+            
+            network.setOptions(options);
+            
+            // Ağaç modunda her şeyi ekrana sığdır
+            if(mode === 'tree') {
+                setTimeout(() => network.fit({animation: true}), 500);
+            }
+        }
+
+        // --- FİZİK VE LAYOUT AYARLARI (SİHİRLİ KISIM) ---
+        function getPhysicsOptions(mode) {
+            if (mode === 'network') {
+                // RESİMDEKİ GİBİ ORGANİK YAPI İÇİN
+                return {
+                    enabled: true,
+                    forceAtlas2Based: {
+                        gravitationalConstant: -100, // Düğümleri birbirinden iter (blobs oluşturur)
+                        centralGravity: 0.005,      // Merkeze hafifçe çeker
+                        springLength: 150,          // Bağlantı uzunluğu
+                        springConstant: 0.05,
+                        damping: 0.4
+                    },
+                    solver: 'forceAtlas2Based',
+                    stabilization: { iterations: 150 }
+                };
             } else {
-                document.getElementById('hierarchyView').style.display = 'none';
-                document.getElementById('networkView').style.display = 'block';
-                document.getElementById('hierarchyBtn').classList.remove('active');
-                document.getElementById('networkBtn').classList.add('active');
-                drawNetwork();
+                // AĞAÇ MODUNDA FİZİK KAPALI (SABİT DURMASI İÇİN)
+                return {
+                    enabled: false
+                };
             }
         }
 
-        function zoomChart(factor) {
-            if (currentView === 'hierarchy') {
-                currentZoom *= factor;
-                currentZoom = Math.max(0.5, Math.min(currentZoom, 2.5));
-                gsap.to('#hierarchyView .org-chart', {
-                    duration: 0.3,
-                    scale: currentZoom,
-                    ease: 'power2.out'
+        function getLayoutOptions(mode) {
+            if (mode === 'tree') {
+                // DÜZENLİ HİYERARŞİ (Üst üste binmeyi engeller)
+                return {
+                    hierarchical: {
+                        enabled: true,
+                        direction: 'UD',        // Yukarıdan Aşağı (Up-Down)
+                        sortMethod: 'directed', // Yönetici ilişkisine göre sırala
+                        levelSeparation: 180,   // Katmanlar arası boşluk
+                        nodeSpacing: 250,       // Yan yana nodlar arası boşluk (Bunu artırdık)
+                        treeSpacing: 250,       // Ağaçlar arası boşluk
+                        blockShifting: true,
+                        edgeMinimization: true,
+                        parentCentralization: true,
+                        shakeTowards: 'leaves'
+                    }
+                };
+            } else {
+                // NETWORK MODUNDA HİYERARŞİ KAPALI
+                return {
+                    hierarchical: { enabled: false }
+                };
+            }
+        }
+
+        // --- VERİ HAZIRLAMA ---
+        function getFilteredData() {
+            const selectedLoc = document.getElementById('locationSelect').value;
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            
+            // 1. Lokasyon Filtresi
+            let filtered = allData.filter(item => 
+                item.Lokasyon && item.Lokasyon.trim() === selectedLoc
+            );
+
+            // 2. Arama Filtresi
+            if (searchTerm.length > 1) {
+                // Arama varsa sadece ilgili kişiyi ve yöneticilerini/astlarını getir (Path finding)
+                // Şimdilik basitçe isme göre filtreleyelim
+                filtered = filtered.filter(item => 
+                    item.ID.toLowerCase().includes(searchTerm) || 
+                    item.Title.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            const nodes = [];
+            const edges = [];
+
+            filtered.forEach(person => {
+                // Avatar oluştur (İsim baş harfleriyle)
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.ID)}&background=random&color=fff&size=128&bold=true`;
+                
+                // Başlıkları (Title) satırlara bölmek için (uzun unvanlar için)
+                const label = `<b>${person.ID}</b>\n${person.Title.substring(0, 20)}${person.Title.length>20?'...':''}`;
+
+                nodes.push({
+                    id: person.ID,
+                    label: label,
+                    title: person.Title, // Tooltip
+                    image: avatarUrl,
+                    // Eğer yönetici ise biraz daha büyük yap
+                    size: person.Manager_ID ? 35 : 50, 
+                    font: { multi: 'html' }
                 });
-            } else if (network) {
-                const scale = network.getScale() * factor;
-                network.moveTo({ scale: scale });
+
+                if (person.Manager_ID) {
+                    // Yönetici de bu listede var mı kontrol et (Filtreleme hatası olmasın)
+                    const managerExists = filtered.find(m => m.ID === person.Manager_ID);
+                    if (managerExists) {
+                        edges.push({
+                            from: person.Manager_ID,
+                            to: person.ID
+                        });
+                    }
+                }
+            });
+
+            return { nodes: nodes, edges: edges };
+        }
+
+        // --- ARAMA VE GÜNCELLEME ---
+        function filterAndDraw() {
+            const data = getFilteredData();
+            network.setData(data);
+            
+            // Eğer ağaç modundaysak tekrar düzenle
+            if(currentView === 'tree') {
+                network.setOptions({ layout: getLayoutOptions('tree') });
             }
         }
 
-        function resetZoom() {
-            if (currentView === 'hierarchy') {
-                currentZoom = 1;
-                gsap.to('#hierarchyView .org-chart', {
-                    duration: 0.3,
-                    scale: 1,
-                    ease: 'power2.out'
-                });
-            } else if (network) {
-                network.fit();
-            }
+        function handleSearch() {
+            // Arama yaparken biraz bekle (performans)
+            clearTimeout(window.searchTimeout);
+            window.searchTimeout = setTimeout(filterAndDraw, 500);
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('dark-theme');
-            const icon = document.getElementById('themeIcon');
-            icon.className = document.body.classList.contains('dark-theme') ? 'fas fa-sun' : 'fas fa-moon';
+        // --- SIDEBAR İŞLEMLERİ ---
+        function openSidebar(person) {
+            document.getElementById('sb-img').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(person.ID)}&background=2563eb&color=fff&size=256`;
+            document.getElementById('sb-name').innerText = person.ID;
+            document.getElementById('sb-title').innerText = person.Title;
+            document.getElementById('sb-loc').innerText = person.Lokasyon;
+            document.getElementById('sb-dept').innerText = "Genel"; // CSV'de departman yoksa genel
+            document.getElementById('sb-manager').innerText = person.Manager_ID || "En Üst Yönetici";
+            
+            document.getElementById('sidebar').classList.add('open');
         }
 
-        // DRAG TO SCROLL
-        let isDown = false;
-        let startX, startY, scrollLeft, scrollTop;
-        const hierarchyView = document.getElementById('hierarchyView');
-
-        hierarchyView.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.node-card')) return;
-            isDown = true;
-            hierarchyView.style.cursor = 'grabbing';
-            startX = e.pageX - hierarchyView.offsetLeft;
-            startY = e.pageY - hierarchyView.offsetTop;
-            scrollLeft = hierarchyView.scrollLeft;
-            scrollTop = hierarchyView.scrollTop;
-        });
-
-        hierarchyView.addEventListener('mouseleave', () => {
-            isDown = false;
-            hierarchyView.style.cursor = 'grab';
-        });
-
-        hierarchyView.addEventListener('mouseup', () => {
-            isDown = false;
-            hierarchyView.style.cursor = 'grab';
-        });
-
-        hierarchyView.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - hierarchyView.offsetLeft;
-            const y = e.pageY - hierarchyView.offsetTop;
-            const walkX = (x - startX) * 1.5;
-            const walkY = (y - startY) * 1.5;
-            hierarchyView.scrollLeft = scrollLeft - walkX;
-            hierarchyView.scrollTop = scrollTop - walkY;
-        });
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+        }
 
     </script>
 </body>
