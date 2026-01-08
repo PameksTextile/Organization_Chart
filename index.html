@@ -1,61 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Pameks Tekstil - Premium Dark Chart</title>
+  <title>Pameks Textile - Corporate Org Chart</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Dark Premium Background */
-    body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #0f172a; overflow: hidden; }
-    #chart-container { width: 100vw; height: calc(100vh - 80px); }
+    /* --- CORPORATE COLOR PALETTE --- */
+    :root {
+      --corp-dark-blue: #263849;   
+      --corp-dark-teal: #005f56;   
+      --corp-mid-mint: #a7c7b7;    
+      --corp-light-mint: #e3ede6;  
+      
+      --text-dark: #1a202c;
+      --text-light: #ffffff;
+      --text-muted: #4a5568;
+    }
+
+    /* --- GENERAL STYLES --- */
+    body { 
+      margin: 0; padding: 0; font-family: 'Inter', sans-serif; 
+      background-color: var(--corp-light-mint); color: var(--text-dark); 
+      overflow: hidden; 
+    }
+    
+    #chart-container { 
+      width: 100vw; height: calc(100vh - 80px); 
+      background-color: var(--corp-light-mint); 
+    }
     
     .top-panel {
-      height: 80px; background: #1e293b; display: flex; align-items: center; 
+      height: 80px; background: #ffffff; display: flex; align-items: center; 
       justify-content: space-between; padding: 0 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: relative; z-index: 100;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.08); position: relative; z-index: 100;
     }
     
     .location-btns { display: flex; gap: 10px; }
-    /* Dark Search Group */
-    .search-group { display: flex; gap: 5px; align-items: center; background: #334155; padding: 5px; border-radius: 30px; border: 1.5px solid #E31E24; }
-    .search-select { padding: 8px 10px; border: none; background: transparent; font-weight: 600; color: #f8fafc; cursor: pointer; outline: none; }
-    .search-input { padding: 10px 20px; border: none; border-radius: 20px; width: 250px; outline: none; font-size: 14px; background: #1e293b; color: white; }
+    
+    .search-group { 
+      display: flex; gap: 5px; align-items: center; background: #f8fafc; 
+      padding: 5px; border-radius: 30px; border: 1.5px solid var(--corp-mid-mint); 
+    }
+    
+    .search-select { 
+      padding: 8px 10px; border: none; background: transparent; 
+      font-weight: 600; color: var(--text-muted); outline: none; 
+    }
+    
+    .search-input { 
+      padding: 10px 20px; border: none; border-radius: 20px; 
+      width: 250px; outline: none; font-size: 14px; 
+      background: #ffffff; color: var(--text-dark); border: 1px solid #e2e8f0; 
+    }
 
-    .btn { padding: 10px 20px; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; background: #334155; color: #94a3b8; }
-    .btn.active { background: #E31E24; color: white; }
+    .btn { 
+      padding: 10px 20px; border: 1.5px solid var(--corp-mid-mint); 
+      border-radius: 25px; cursor: pointer; font-weight: 600; 
+      transition: all 0.2s; background: #ffffff; color: var(--corp-dark-teal); 
+    }
+    .btn.active { 
+      background: var(--corp-dark-teal); color: #ffffff; border-color: var(--corp-dark-teal); 
+    }
 
-    /* --- DARK MODAL STYLES --- */
+    /* --- MODAL STİLLERİ --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px);
+      background: rgba(38, 56, 73, 0.5); backdrop-filter: blur(4px);
       display: none; align-items: center; justify-content: center; z-index: 3000;
     }
     .modal-content {
-      background: #1e293b; width: 90%; max-width: 400px; padding: 40px;
-      border-radius: 20px; border: 1px solid #334155; color: white;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      background: #ffffff; width: 90%; max-width: 400px; padding: 40px;
+      border-radius: 25px; border: 1px solid #e2e8f0;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
       position: relative; animation: modalSlideUp 0.3s ease;
     }
     @keyframes modalSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     
-    .close-modal { position: absolute; top: 20px; right: 20px; border: none; background: none; font-size: 28px; cursor: pointer; color: #94a3b8; }
-    .modal-header { border-bottom: 2px solid #334155; padding-bottom: 20px; margin-bottom: 20px; text-align: center; }
-    .modal-name { font-size: 20px; font-weight: 700; color: white; margin: 0; }
-    .modal-title { font-size: 13px; color: #E31E24; font-weight: 700; text-transform: uppercase; margin-top: 10px; letter-spacing: 0.5px; }
-    .modal-item { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
-    .modal-label { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-    .modal-value { font-size: 15px; font-weight: 600; color: #f1f5f9; word-break: break-word; }
+    .close-modal { position: absolute; top: 20px; right: 20px; border: none; background: none; font-size: 28px; cursor: pointer; color: var(--text-muted); }
+    .modal-header { border-bottom: 2px solid var(--corp-light-mint); padding-bottom: 20px; margin-bottom: 20px; text-align: center; }
+    .modal-name { font-size: 22px; font-weight: 700; color: var(--corp-dark-blue); margin: 0; }
+    .modal-title { font-size: 14px; color: var(--corp-dark-teal); font-weight: 600; text-transform: uppercase; margin-top: 8px; }
 
-    /* Highlight Adjustment */
-    .node-highlight-rect, .node-highlight-circle, .node-highlight-path, svg rect[fill="none"][stroke-width] { display: none !important; opacity: 0 !important; }
-    .highlighted-node { box-shadow: inset 0 0 0 6px #ffd700, 0 0 30px rgba(255, 215, 0, 0.3) !important; }
+    .modal-item { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
+    .modal-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .modal-value { font-size: 16px; font-weight: 500; color: var(--text-dark); }
+
+    .highlighted-node { 
+      box-shadow: 0 0 0 4px var(--corp-dark-teal), 0 0 30px rgba(0, 95, 86, 0.4) !important; 
+    }
 
     .controls { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-    .control-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: #1e293b; color: white; font-size: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; border: 1px solid #334155; }
+    .control-btn { 
+      width: 46px; height: 46px; border-radius: 50%; border: 1px solid #e2e8f0; 
+      background: #ffffff; color: var(--corp-dark-blue); font-size: 20px; cursor: pointer; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; 
+    }
 
-    #loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: white; font-weight: 600; }
-    /* Lighter Links for Dark Background */
-    .link { stroke: #475569 !important; stroke-width: 2px !important; }
+    #loading { 
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+      font-size: 1.2rem; color: var(--corp-dark-blue); font-weight: 600; 
+      background: #fff; padding: 20px 40px; border-radius: 50px;
+    }
+    
+    .link { stroke: var(--corp-mid-mint) !important; stroke-width: 2px !important; }
   </style>
 </head>
 <body>
@@ -67,7 +114,7 @@
     </div>
     <div class="search-group">
       <select id="searchType" class="search-select">
-        <option value="id">Search Person</option>
+        <option value="id">Search Name</option>
         <option value="title">Search Title</option>
       </select>
       <input type="text" id="searchInput" class="search-input" placeholder="Search..." list="searchList">
@@ -75,7 +122,7 @@
     </div>
   </div>
 
-  <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <button class="close-modal" onclick="closeModal()">×</button>
       <div class="modal-header">
@@ -91,7 +138,7 @@
         <span id="mEmail" class="modal-value"></span>
       </div>
       <div id="m-phone-box" class="modal-item">
-        <span class="modal-label">Phone</span>
+        <span class="modal-label">Ext. / Phone</span>
         <span id="mPhone" class="modal-value"></span>
       </div>
     </div>
@@ -100,7 +147,7 @@
   <div class="controls">
     <button class="control-btn" onclick="chart.zoomIn()" title="Zoom In">+</button>
     <button class="control-btn" onclick="chart.zoomOut()" title="Zoom Out">-</button>
-    <button class="control-btn" onclick="chart.fit()" title="Fit to Screen">⟲</button>
+    <button class="control-btn" onclick="chart.fit()" title="Reset Zoom">⟲</button>
     <button class="control-btn" onclick="toggleFullScreen()" title="Full Screen">⛶</button>
   </div>
 
@@ -134,29 +181,38 @@
       document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
       document.getElementById('btn-' + loc).classList.add('active');
       document.getElementById('searchInput').value = "";
-      closeModal();
+      
       const filtered = allData.filter(d => d.location === loc);
       const idsInLocation = new Set(filtered.map(d => d.id));
       const managers = new Set(filtered.map(d => d.parentId).filter(p => p && idsInLocation.has(p)));
+      
       currentFilteredData = filtered.map(d => ({
         ...d,
         parentId: idsInLocation.has(d.parentId) ? d.parentId : null,
         isManager: managers.has(d.id)
       }));
+      
       updateSearchList();
       renderChart(currentFilteredData);
     }
 
+    // --- UPDATED SEARCH LIST FUNCTION ---
     function updateSearchList() {
       const type = document.getElementById('searchType').value;
       const list = document.getElementById('searchList');
       list.innerHTML = "";
+      
+      // Selects unique values based on dropdown selection (id or title)
       const values = [...new Set(currentFilteredData.map(d => type === 'id' ? d.id : d.title))];
+      
       values.forEach(v => {
-        const opt = document.createElement('option'); opt.value = v; list.appendChild(opt);
+        const opt = document.createElement('option'); 
+        opt.value = v; 
+        list.appendChild(opt);
       });
     }
 
+    // --- ADDED MISSING EVENT LISTENER ---
     document.getElementById('searchType').addEventListener('change', updateSearchList);
 
     document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -183,10 +239,8 @@
       document.getElementById('mTitle').innerText = d.title;
       const manager = currentFilteredData.find(p => p.id === d.parentId);
       document.getElementById('mManager').innerText = manager ? manager.id : "Top Management";
-      document.getElementById('mEmail').innerText = d.email;
-      document.getElementById('m-email-box').style.display = d.email ? 'flex' : 'none';
-      document.getElementById('mPhone').innerText = d.phone;
-      document.getElementById('m-phone-box').style.display = d.phone ? 'flex' : 'none';
+      document.getElementById('mEmail').innerText = d.email || "-";
+      document.getElementById('mPhone').innerText = d.phone || "-";
       document.getElementById('modalOverlay').style.display = 'flex';
     };
 
@@ -197,30 +251,40 @@
       chart = new d3.OrgChart()
         .container('#chart-container')
         .data(data)
-        .nodeHeight(d => 105)
+        .layout("top")    
+        .compact(false)   
+        .nodeHeight(d => 100)
         .nodeWidth(d => 230)
-        .childrenMargin(d => 85)
-        .compactMarginBetween(d => 65)
+        .childrenMargin(d => 60)
+        .compactMarginBetween(d => 40)
         .nodeContent(function(d) {
-          let bgColor, textColor, titleColor, borderRadius;
-          // Hierarchy styling adjusted for Dark Mode
+          let bgColor, textColor, titleColor, borderRadius, borderStyle;
+          
           if (d.depth === 0) { 
-            bgColor = '#E31E24'; textColor = '#ffffff'; titleColor = '#ffcccc'; borderRadius = '60px'; // CEO
+            bgColor = 'var(--corp-dark-blue)'; textColor = '#ffffff'; 
+            titleColor = 'var(--corp-mid-mint)'; borderRadius = '50px'; borderStyle = 'none';
           } else if (d.data.isManager && d.depth === 1) { 
-            bgColor = '#002147'; textColor = '#ffffff'; titleColor = '#cbd5e0'; borderRadius = '4px';  // Executives
+            bgColor = 'var(--corp-dark-teal)'; textColor = '#ffffff'; 
+            titleColor = 'var(--corp-light-mint)'; borderRadius = '8px'; borderStyle = 'none';
           } else if (d.data.isManager) { 
-            bgColor = '#2C3E50'; textColor = '#ffffff'; titleColor = '#94a3b8'; borderRadius = '15px'; // Managers
+            bgColor = 'var(--corp-mid-mint)'; textColor = 'var(--corp-dark-blue)'; 
+            titleColor = 'var(--corp-dark-teal)'; borderRadius = '15px'; borderStyle = 'none';
           } else { 
-            bgColor = '#475569'; textColor = '#f8fafc'; titleColor = '#cbd5e0'; borderRadius = '35px'; // Staff
+            bgColor = '#ffffff'; textColor = 'var(--text-dark)'; 
+            titleColor = 'var(--text-muted)'; borderRadius = '30px';
+            borderStyle = '2px solid var(--corp-mid-mint)';
           }
 
           const highlightClass = d.data._highlighted ? 'highlighted-node' : '';
           const displayName = d.data.id.split(' & ').join('<br/>');
 
           return `
-            <div class="${highlightClass}" ondblclick="window.showModalById('${d.data.id}')" style="background:${bgColor}; height:100%; padding:12px; border-radius:${borderRadius}; text-align:center; display:flex; flex-direction:column; justify-content:center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor:pointer; border:1px solid rgba(255,255,255,0.1);">
-              <div style="font-size:12px; font-weight:700; color:${titleColor}; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; line-height:1.1; pointer-events: none;">${d.data.title}</div>
-              <div style="font-size:15px; font-weight:600; color:${textColor}; line-height:1.2; pointer-events: none;">${displayName}</div>
+            <div class="${highlightClass}" ondblclick="window.showModalById('${d.data.id}')" 
+                 style="background:${bgColor}; height:100%; padding:12px; border-radius:${borderRadius}; 
+                        text-align:center; display:flex; flex-direction:column; justify-content:center; 
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.06); cursor:pointer; border:${borderStyle};">
+              <div style="font-size:11px; font-weight:700; color:${titleColor}; text-transform:uppercase; margin-bottom:4px; line-height:1.1;">${d.data.title}</div>
+              <div style="font-size:14px; font-weight:600; color:${textColor}; line-height:1.2;">${displayName}</div>
             </div>`;
         })
         .render()
